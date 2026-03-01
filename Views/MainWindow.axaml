@@ -1,0 +1,63 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PilotApp.ViewModels"
+        xmlns:views="clr-namespace:PilotApp.Views"
+        x:Class="PilotApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1200" Height="720"
+        MinWidth="900" MinHeight="560"
+        Title="PilotApp">
+
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Grid.Row="0"
+            Padding="12,8"
+            BorderThickness="0,0,0,1">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="2"
+                    Orientation="Horizontal"
+                    Spacing="8">
+          <Button Content="Загрузить"
+                  Command="{Binding LoadDataCommand}"
+                  IsEnabled="{Binding !IsBusy}"/>
+          <Button Content="Сохранить"
+                  Command="{Binding SaveDataCommand}"
+                  IsEnabled="{Binding !IsBusy}"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <TabControl Grid.Row="1" Margin="8">
+
+      <TabItem Header="Задачи">
+        <views:TasksView DataContext="{Binding Tasks}"/>
+      </TabItem>
+
+      <TabItem Header="Документы">
+        <views:DocumentsView DataContext="{Binding Documents}"/>
+      </TabItem>
+
+      <TabItem Header="Учёт времени">
+        <views:TimeView DataContext="{Binding Time}"/>
+      </TabItem>
+
+    </TabControl>
+
+    <Border Grid.Row="2"
+            Padding="12,6"
+            BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0"
+                   Text="{Binding StatusMessage}"
+                   FontSize="12"
+                   Opacity="0.7"
+                   VerticalAlignment="Center"/>
+        <ProgressBar Grid.Column="1"
+                     IsIndeterminate="True"
+                     IsVisible="{Binding IsBusy}"
+                     Width="120"
+                     Height="4"/>
+      </Grid>
+    </Border>
+
+  </Grid>
+</Window>

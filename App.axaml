@@ -1,0 +1,14 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:PilotApp.Converters"
+             x:Class="PilotApp.App">
+
+  <Application.Resources>
+    <conv:TaskStatusConverter x:Key="TaskStatusConverter"/>
+    <conv:DueDateColorConverter x:Key="DueDateColorConverter"/>
+  </Application.Resources>
+    
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+</Application>
