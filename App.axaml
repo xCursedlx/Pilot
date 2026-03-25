@@ -3,12 +3,14 @@
              xmlns:conv="clr-namespace:PilotApp.Converters"
              x:Class="PilotApp.App">
 
-  <Application.Resources>
-    <conv:TaskStatusConverter x:Key="TaskStatusConverter"/>
-    <conv:DueDateColorConverter x:Key="DueDateColorConverter"/>
-  </Application.Resources>
-    
+    <Application.Resources>
+        <conv:TaskStatusConverter   x:Key="TaskStatusConverter"/>
+        <conv:DueDateColorConverter x:Key="DueDateColorConverter"/>
+        <conv:TaskPriorityConverter x:Key="TaskPriorityConverter"/>
+    </Application.Resources>
+
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme/>
     </Application.Styles>
+
 </Application>

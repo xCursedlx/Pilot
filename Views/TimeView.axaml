@@ -1,15 +1,18 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:PilotApp.ViewModels"
+             xmlns:models="clr-namespace:PilotApp.Models"
              x:DataType="vm:TimeViewModel"
              x:Class="PilotApp.Views.TimeView">
 
   <Grid RowDefinitions="Auto,*" Margin="12">
+
     <Border Grid.Row="0"
             Padding="14"
             Margin="0,0,0,12"
             CornerRadius="6"
-            BorderThickness="1">
+            BorderThickness="1"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
       <StackPanel Spacing="8">
 
         <TextBlock Text="Новая запись времени"
@@ -17,7 +20,7 @@
                    FontWeight="SemiBold"
                    Margin="0,0,0,2"/>
 
-        <Grid ColumnDefinitions="2*,2*,Auto,Auto" >
+        <Grid ColumnDefinitions="2*,2*,Auto,Auto">
 
           <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="4">
             <TextBlock Text="Задача" FontSize="11" Opacity="0.7"/>
@@ -54,7 +57,6 @@
             <TextBox Text="{Binding NewComment, Mode=TwoWay}"
                      Watermark="Необязательно"/>
           </StackPanel>
-
           <Button Grid.Column="1"
                   Content="Добавить"
                   Command="{Binding AddEntryCommand}"
@@ -65,6 +67,7 @@
     </Border>
 
     <Grid Grid.Row="1" ColumnDefinitions="3*,2*">
+
       <Grid Grid.Column="0"
             RowDefinitions="Auto,*,Auto"
             Margin="0,0,12,0">
@@ -86,16 +89,15 @@
                  ItemsSource="{Binding FilteredEntries}"
                  SelectedItem="{Binding SelectedEntry, Mode=TwoWay}">
           <ListBox.ItemTemplate>
-            <DataTemplate>
+            <DataTemplate DataType="models:TimeEntry">
               <Grid ColumnDefinitions="*,Auto" Margin="4,3">
-
                 <StackPanel Grid.Column="0" Spacing="2">
                   <TextBlock Text="{Binding TaskTitle}"
                              FontWeight="SemiBold"
                              TextTrimming="CharacterEllipsis"/>
                   <TextBlock FontSize="11" Opacity="0.6">
                     <TextBlock.Text>
-                      <MultiBinding StringFormat="{}{0} · {1:dd.MM.yyyy}">
+                      <MultiBinding StringFormat="{}{0} - {1:dd.MM.yyyy}">
                         <Binding Path="User"/>
                         <Binding Path="Date"/>
                       </MultiBinding>
@@ -107,16 +109,16 @@
                              IsVisible="{Binding Comment,
                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                 </StackPanel>
-
                 <Border Grid.Column="1"
-                        Background="Gray"
+                        Background="{DynamicResource SystemControlHighlightAccentBrush}"
                         CornerRadius="4"
                         Padding="8,2"
                         VerticalAlignment="Top"
                         Margin="8,0,0,0">
                   <TextBlock Text="{Binding Hours, StringFormat='{}{0:0.#} ч'}"
                              FontWeight="SemiBold"
-                             FontSize="12"/>
+                             FontSize="12"
+                             Foreground="White"/>
                 </Border>
               </Grid>
             </DataTemplate>
@@ -127,40 +129,38 @@
                 Padding="12,7"
                 Margin="0,8,0,0"
                 CornerRadius="4"
-                Background="DimGray">
-          <TextBlock FontWeight="SemiBold">
-            <TextBlock.Text>
-              <MultiBinding StringFormat="Итого (по фильтру): {0:0.#} ч">
-                <Binding Path="TotalHours"/>
-              </MultiBinding>
-            </TextBlock.Text>
-          </TextBlock>
+                BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+          <TextBlock FontWeight="SemiBold"
+                     Text="{Binding TotalHours, StringFormat='Итого (по фильтру): {0:0.#} ч'}"/>
         </Border>
       </Grid>
-      
+
       <Grid Grid.Column="1" RowDefinitions="*,Auto">
+
         <StackPanel Grid.Row="0" Spacing="6">
           <TextBlock Text="Часы по исполнителям"
                      FontSize="13"
                      FontWeight="SemiBold"
                      Margin="0,0,0,4"/>
-
           <ListBox ItemsSource="{Binding UserSummaries}"
                    IsHitTestVisible="False">
             <ListBox.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate DataType="vm:UserSummary">
                 <Grid ColumnDefinitions="*,Auto" Margin="4,2">
                   <TextBlock Grid.Column="0"
                              Text="{Binding User}"
                              TextTrimming="CharacterEllipsis"/>
                   <Border Grid.Column="1"
-                          Background="Gray"
+                          Background="{DynamicResource SystemControlHighlightAccentBrush}"
                           CornerRadius="4"
                           Padding="6,2"
                           Margin="8,0,0,0">
                     <TextBlock Text="{Binding Hours, StringFormat='{}{0:0.#} ч'}"
                                FontWeight="SemiBold"
-                               FontSize="11"/>
+                               FontSize="11"
+                               Foreground="White"/>
                   </Border>
                 </Grid>
               </DataTemplate>
@@ -169,25 +169,23 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Spacing="6" Margin="0,16,0,0">
-
           <TextBlock Text="Записи прошлых дней"
                      FontSize="13"
                      FontWeight="SemiBold"
-                     Foreground="#E65100"
+                     Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}"
                      Margin="0,0,0,4"/>
-
-          <ListBox ItemsSource="{Binding OverdueEntries}"
+          <ListBox ItemsSource="{Binding OldEntries}"
                    IsHitTestVisible="False"
                    MaxHeight="180">
             <ListBox.ItemTemplate>
-              <DataTemplate>
+              <DataTemplate DataType="models:TimeEntry">
                 <StackPanel Spacing="2" Margin="4,2">
                   <TextBlock Text="{Binding TaskTitle}"
                              FontWeight="SemiBold"
                              TextTrimming="CharacterEllipsis"/>
                   <TextBlock FontSize="11" Opacity="0.7">
                     <TextBlock.Text>
-                      <MultiBinding StringFormat="{}{0} · {1:dd.MM.yyyy} · {2:0.#} ч">
+                      <MultiBinding StringFormat="{}{0} - {1:dd.MM.yyyy} - {2:0.#} ч">
                         <Binding Path="User"/>
                         <Binding Path="Date"/>
                         <Binding Path="Hours"/>
@@ -198,7 +196,6 @@
               </DataTemplate>
             </ListBox.ItemTemplate>
           </ListBox>
-
         </StackPanel>
 
       </Grid>

@@ -2,37 +2,36 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PilotApp.Models;
+using PilotApp.Services;
 
 namespace PilotApp.ViewModels;
 
 public partial class TimeViewModel : ObservableObject
 {
+    private Action?         _markDirty;
+    private IDialogService? _dialog;
+    private TasksViewModel? _tasksVm;
+
+    public void SetDirtyCallback(Action markDirty)      => _markDirty = markDirty;
+    public void SetDialogService(IDialogService dialog)  => _dialog    = dialog;
+    public void SetTasksSource(TasksViewModel tasks)     => _tasksVm   = tasks;
+
     public ObservableCollection<TimeEntry> Entries { get; } = new();
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DeleteEntryCommand))]
     private TimeEntry? selectedEntry;
 
-    [ObservableProperty]
-    private string newTaskTitle = string.Empty;
-
-    [ObservableProperty]
-    private string newUser = string.Empty;
-
-    [ObservableProperty]
-    private DateTime newDate = DateTime.Today;
-
-    [ObservableProperty]
-    private double newHours;
-
-    [ObservableProperty]
-    private string newComment = string.Empty;
-
-    [ObservableProperty]
-    private string filterUser = string.Empty;
+    [ObservableProperty] private string   newTaskTitle = string.Empty;
+    [ObservableProperty] private string   newUser      = string.Empty;
+    [ObservableProperty] private DateTime newDate      = DateTime.Today;
+    [ObservableProperty] private double   newHours;
+    [ObservableProperty] private string   newComment   = string.Empty;
+    [ObservableProperty] private string   filterUser   = string.Empty;
 
     public IEnumerable<TimeEntry> FilteredEntries =>
         Entries.Where(e =>
@@ -47,14 +46,19 @@ public partial class TimeViewModel : ObservableObject
             .Select(g => new UserSummary(g.Key, g.Sum(e => e.Hours)))
             .OrderByDescending(s => s.Hours);
 
-    public IEnumerable<TimeEntry> OverdueEntries =>
-        Entries.Where(e => e.Date < DateTime.Today.AddDays(-1));
+    public IEnumerable<TimeEntry> OldEntries =>
+        Entries.Where(e => e.Date < DateTime.Today.AddDays(-7));
 
     [RelayCommand(CanExecute = nameof(CanAdd))]
     private void AddEntry()
     {
+        var matched = _tasksVm?.Tasks
+            .FirstOrDefault(t => t.Title.Equals(NewTaskTitle.Trim(),
+                StringComparison.OrdinalIgnoreCase));
+
         var entry = new TimeEntry
         {
+            TaskId    = matched?.Id,
             TaskTitle = NewTaskTitle.Trim(),
             User      = NewUser.Trim(),
             Date      = NewDate,
@@ -62,29 +66,38 @@ public partial class TimeViewModel : ObservableObject
             Comment   = string.IsNullOrWhiteSpace(NewComment) ? null : NewComment.Trim()
         };
         Entries.Add(entry);
+        _markDirty?.Invoke();
         RefreshAll();
         NewTaskTitle = string.Empty;
         NewHours     = 0;
         NewComment   = string.Empty;
     }
 
-    private bool CanAdd() =>
-        !string.IsNullOrWhiteSpace(NewTaskTitle) && NewHours > 0;
+    private bool CanAdd() => !string.IsNullOrWhiteSpace(NewTaskTitle) && NewHours > 0;
 
     [RelayCommand(CanExecute = nameof(CanDelete))]
-    private void DeleteEntry()
+    private async Task DeleteEntry()
     {
         if (SelectedEntry is null) return;
+        if (_dialog is not null)
+        {
+            var ok = await _dialog.ConfirmAsync(
+                "Удаление записи",
+                $"Удалить запись «{SelectedEntry.TaskTitle}»?");
+            if (!ok) return;
+        }
         var idx = Entries.IndexOf(SelectedEntry);
         Entries.Remove(SelectedEntry);
         SelectedEntry = Entries.Count == 0
             ? null
             : Entries[Math.Clamp(idx, 0, Entries.Count - 1)];
+        _markDirty?.Invoke();
         RefreshAll();
     }
 
     private bool CanDelete() => SelectedEntry is not null;
-    partial void OnFilterUserChanged(string value) => RefreshAll();
+
+    partial void OnFilterUserChanged(string value)  => RefreshAll();
     partial void OnNewTaskTitleChanged(string value) => AddEntryCommand.NotifyCanExecuteChanged();
     partial void OnNewHoursChanged(double value)     => AddEntryCommand.NotifyCanExecuteChanged();
 
@@ -93,18 +106,18 @@ public partial class TimeViewModel : ObservableObject
         OnPropertyChanged(nameof(FilteredEntries));
         OnPropertyChanged(nameof(TotalHours));
         OnPropertyChanged(nameof(UserSummaries));
-        OnPropertyChanged(nameof(OverdueEntries));
+        OnPropertyChanged(nameof(OldEntries));
     }
-    
+
     public void Load(IEnumerable<TimeEntry> items)
     {
         Entries.Clear();
-        foreach (var e in items)
-            Entries.Add(e);
+        foreach (var e in items) Entries.Add(e);
         SelectedEntry = Entries.FirstOrDefault();
         RefreshAll();
     }
 
     public IEnumerable<TimeEntry> Dump() => Entries;
 }
+
 public sealed record UserSummary(string User, double Hours);

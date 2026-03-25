@@ -1,11 +1,16 @@
 ﻿<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:PilotApp.ViewModels"
+             xmlns:models="clr-namespace:PilotApp.Models"
              x:DataType="vm:DocumentsViewModel"
              x:Class="PilotApp.Views.DocumentsView">
 
   <Grid RowDefinitions="Auto,*" Margin="12">
-    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+
+    <StackPanel Grid.Row="0"
+                Orientation="Horizontal"
+                Spacing="8"
+                Margin="0,0,0,10">
       <Button Content="Добавить" Command="{Binding AddDocumentCommand}"/>
       <Button Content="Удалить"  Command="{Binding DeleteDocumentCommand}"/>
       <TextBox Watermark="Поиск по названию / версии"
@@ -14,12 +19,13 @@
     </StackPanel>
 
     <Grid Grid.Row="1" ColumnDefinitions="2*,3*">
+
       <ListBox Grid.Column="0"
                Margin="0,0,10,0"
                ItemsSource="{Binding FilteredDocuments}"
                SelectedItem="{Binding SelectedDocument, Mode=TwoWay}">
         <ListBox.ItemTemplate>
-          <DataTemplate>
+          <DataTemplate DataType="models:DocumentItem">
             <Grid ColumnDefinitions="*,Auto" Margin="4,2">
               <StackPanel Grid.Column="0">
                 <TextBlock Text="{Binding Name}"
@@ -30,11 +36,13 @@
                            Opacity="0.6"/>
               </StackPanel>
               <Border Grid.Column="1"
-                      Background="Gray"
+                      Background="{DynamicResource SystemControlHighlightAccentBrush}"
                       CornerRadius="4"
                       Padding="6,2"
                       VerticalAlignment="Center">
-                <TextBlock Text="{Binding Version}" FontSize="11"/>
+                <TextBlock Text="{Binding Version}"
+                           FontSize="11"
+                           Foreground="White"/>
               </Border>
             </Grid>
           </DataTemplate>
@@ -43,7 +51,8 @@
 
       <ScrollViewer Grid.Column="1">
         <StackPanel Spacing="8"
-                    IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    IsEnabled="{Binding SelectedDocument,
+                      Converter={x:Static ObjectConverters.IsNotNull}}"
                     Margin="4,0,0,0">
 
           <TextBlock Text="Карточка документа"
@@ -51,41 +60,55 @@
                      FontWeight="SemiBold"
                      Margin="0,0,0,4"/>
 
-          <TextBlock Text="Название"/>
-          <TextBox Text="{Binding SelectedDocument.Name, Mode=TwoWay}"/>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Название" FontSize="11" Opacity="0.6"/>
+            <TextBox Text="{Binding SelectedDocument.Name, Mode=TwoWay}"
+                     Watermark="Название документа"/>
+          </StackPanel>
 
-          <TextBlock Text="Описание"/>
-          <TextBox Text="{Binding SelectedDocument.Description, Mode=TwoWay}"
-                   AcceptsReturn="True"
-                   MinHeight="80"/>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Описание" FontSize="11" Opacity="0.6"/>
+            <TextBox Text="{Binding SelectedDocument.Description, Mode=TwoWay}"
+                     AcceptsReturn="True"
+                     MinHeight="80"
+                     Watermark="Описание документа"/>
+          </StackPanel>
 
-          <TextBlock Text="Версия"/>
-          <ComboBox ItemsSource="{Binding Versions}"
-                    SelectedItem="{Binding SelectedDocument.Version, Mode=TwoWay}"
-                    HorizontalAlignment="Stretch"/>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Версия" FontSize="11" Opacity="0.6"/>
+            <TextBox Text="{Binding SelectedDocument.Version, Mode=TwoWay}"
+                     Watermark="v1, v2, v1.1 ..."/>
+          </StackPanel>
 
-          <TextBlock Text="Связанная задача (ID или название)"/>
-          <TextBox Text="{Binding SelectedDocument.LinkedTaskId, Mode=TwoWay}"/>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Связанная задача (ID)" FontSize="11" Opacity="0.6"/>
+            <TextBox Text="{Binding SelectedDocument.LinkedTaskId, Mode=TwoWay}"
+                     Watermark="ID задачи"/>
+          </StackPanel>
 
-          <TextBlock Text="Путь к файлу"/>
-          <Grid ColumnDefinitions="*,Auto">
-            <TextBox Grid.Column="0"
-                     Text="{Binding SelectedDocument.FilePath, Mode=TwoWay}"
-                     IsReadOnly="True"
-                     Watermark="Файл не выбран"/>
-            <Button Grid.Column="1"
-                    Content="Обзор…"
-                    Command="{Binding PickFileCommand}"
-                    Margin="6,0,0,0"/>
-          </Grid>
+          <StackPanel Spacing="4">
+            <TextBlock Text="Путь к файлу" FontSize="11" Opacity="0.6"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBox Grid.Column="0"
+                       Text="{Binding SelectedDocument.FilePath, Mode=TwoWay}"
+                       IsReadOnly="True"
+                       Watermark="Файл не выбран"/>
+              <Button Grid.Column="1"
+                      Content="Обзор..."
+                      Command="{Binding PickFileCommand}"
+                      Margin="6,0,0,0"/>
+            </Grid>
+          </StackPanel>
 
-          <TextBlock Text="{Binding SelectedDocument.CreatedAt, StringFormat='Создан: {0:dd.MM.yyyy HH:mm}'}"
+          <TextBlock Text="{Binding SelectedDocument.CreatedAt,
+                       StringFormat='Создан: {0:dd.MM.yyyy HH:mm}'}"
                      Opacity="0.6"
                      FontSize="11"
                      Margin="0,4,0,0"/>
 
         </StackPanel>
       </ScrollViewer>
+
     </Grid>
   </Grid>
 </UserControl>

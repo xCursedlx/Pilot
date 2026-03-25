@@ -29,6 +29,12 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/DocumentsView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/GlobalSearchView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/KanbanView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

@@ -1,3 +1,5 @@
+C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.csproj.AssemblyReference.cache
+C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\Avalonia\Resources.Inputs.cache
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\PilotApp.exe
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\PilotApp.deps.json
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\PilotApp.runtimeconfig.json
@@ -60,13 +62,12 @@ C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\runtimes\osx\nat
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\runtimes\win-arm64\native\libSkiaSharp.dll
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\runtimes\win-x64\native\libSkiaSharp.dll
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\bin\Debug\net8.0\runtimes\win-x86\native\libSkiaSharp.dll
-C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.csproj.AssemblyReference.cache
-C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\Avalonia\Resources.Inputs.cache
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\Avalonia\resources
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.AssemblyInfoInputs.cache
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.AssemblyInfo.cs
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.csproj.CoreCompileInputs.cache
+C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.sourcelink.json
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.csproj.Up2Date
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\PilotApp.dll
 C:\Users\crazy\RiderProjects\PilotApp\PilotApp\obj\Debug\net8.0\refint\PilotApp.dll

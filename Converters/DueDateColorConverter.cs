@@ -7,25 +7,17 @@ namespace PilotApp.Converters;
 
 public sealed class DueDateColorConverter : IValueConverter
 {
-    public static readonly DueDateColorConverter Instance = new();
-
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        DateTime? due = value switch
-        {
-            DateTime dt             => dt,
-            DateTimeOffset dto      => dto.DateTime,
-            _                       => null
-        };
-        if (due is null)
-            return new SolidColorBrush(Color.Parse("#757575"));
-        if (due.Value.Date < DateTime.Today)
-            return new SolidColorBrush(Color.Parse("#C62828"));
-        if (due.Value.Date == DateTime.Today)
-            return new SolidColorBrush(Color.Parse("#E65100"));
-        return new SolidColorBrush(Color.Parse("#2E7D32"));
+        if (value is not DateTime dt) return null;
+
+        if (dt.Date < DateTime.Today)
+            return new SolidColorBrush(Color.Parse("#d32f2f"));
+        if (dt.Date <= DateTime.Today.AddDays(2))
+            return new SolidColorBrush(Color.Parse("#f57c00"));
+        return new SolidColorBrush(Color.Parse("#388e3c"));
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => throw new NotSupportedException();
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
 }
