@@ -13,18 +13,19 @@ namespace PilotApp.ViewModels;
 public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
     private readonly IRepository _repo;
-    private readonly Timer       _autoSaveTimer;
-    private bool                 _isDirty;
+    private readonly Timer _autoSaveTimer;
+    private bool _isDirty;
 
-    public TasksViewModel        Tasks        { get; } = new();
-    public DocumentsViewModel    Documents    { get; } = new();
-    public TimeViewModel         Time         { get; } = new();
-    public KanbanViewModel       Kanban       { get; }
+    public TasksViewModel Tasks { get; } = new();
+    public DocumentsViewModel Documents { get; } = new();
+    public TimeViewModel Time { get; } = new();
+    public KanbanViewModel Kanban{ get; }
     public GlobalSearchViewModel GlobalSearch { get; }
+    public DashboardViewModel Dashboard { get; }
 
     [ObservableProperty] private string statusMessage = "Готово";
-    [ObservableProperty] private bool   isBusy;
-    [ObservableProperty] private bool   isDarkTheme = true;
+    [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private bool isDarkTheme = true;
 
     partial void OnIsDarkThemeChanged(bool value) => ApplyTheme(value);
 
@@ -46,6 +47,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         Time.Entries.Count > 0 ? $"Время ({Time.Entries.Count})" : "Время";
 
     public string KanbanHeader => "Канбан";
+    public string DashboardHeader => "Обзор";
 
     public int OverdueTasksCount =>
         Tasks.Tasks.Count(t =>
@@ -57,11 +59,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
     public MainWindowViewModel(IRepository repo)
     {
-        _repo        = repo;
-        Kanban       = new KanbanViewModel(Tasks);
+        _repo = repo;
+        Kanban = new KanbanViewModel(Tasks);
         GlobalSearch = new GlobalSearchViewModel(Tasks, Documents, Time);
+        Dashboard = new DashboardViewModel(Tasks, Documents, Time);
 
         Time.SetTasksSource(Tasks);
+        Documents.SetTasksSource(Tasks);
 
         Tasks.SetDirtyCallback(MarkDirty);
         Documents.SetDirtyCallback(MarkDirty);
@@ -72,9 +76,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         Documents.SetDialogService(dialog);
         Time.SetDialogService(dialog);
 
-        Tasks.Tasks.CollectionChanged         += (_, _) => RefreshCounters();
+        Tasks.Tasks.CollectionChanged += (_, _) => RefreshCounters();
         Documents.Documents.CollectionChanged += (_, _) => RefreshCounters();
-        Time.Entries.CollectionChanged        += (_, _) => RefreshCounters();
+        Time.Entries.CollectionChanged += (_, _) => RefreshCounters();
 
         _autoSaveTimer = new Timer(
             async _ => await AutoSaveAsync(),
@@ -139,8 +143,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             var data = new Models.AppData
             {
-                Tasks       = Tasks.Dump().ToList(),
-                Documents   = Documents.Dump().ToList(),
+                Tasks = Tasks.Dump().ToList(),
+                Documents = Documents.Dump().ToList(),
                 TimeEntries = Time.Dump().ToList()
             };
             await _repo.SaveAsync(data);
@@ -164,8 +168,8 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         {
             var data = new Models.AppData
             {
-                Tasks       = Tasks.Dump().ToList(),
-                Documents   = Documents.Dump().ToList(),
+                Tasks = Tasks.Dump().ToList(),
+                Documents = Documents.Dump().ToList(),
                 TimeEntries = Time.Dump().ToList()
             };
             await _repo.SaveAsync(data);
@@ -211,10 +215,10 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(
             new Avalonia.Platform.Storage.FilePickerSaveOptions
             {
-                Title             = title,
+                Title = title,
                 SuggestedFileName = suggestedName,
-                DefaultExtension  = "csv",
-                FileTypeChoices   = new[]
+                DefaultExtension = "csv",
+                FileTypeChoices = new[]
                 {
                     new Avalonia.Platform.Storage.FilePickerFileType("CSV файл")
                     {

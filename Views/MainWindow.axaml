@@ -6,91 +6,69 @@
         x:DataType="vm:MainWindowViewModel"
         Width="1200" Height="720"
         MinWidth="900" MinHeight="560"
-        Title="PilotApp">
+        Title="PilotApp — ИС управления проектами">
 
-  <Window.KeyBindings>
-    <KeyBinding Gesture="Ctrl+F" Command="{Binding ToggleSearchCommand}"/>
-    <KeyBinding Gesture="Escape" Command="{Binding ToggleSearchCommand}"/>
-  </Window.KeyBindings>
-
-  <Grid>
-
-    <Grid RowDefinitions="Auto,*,Auto">
-
-      <Border Grid.Row="0"
-              Padding="12,8"
-              BorderThickness="0,0,0,1"
-              BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-        <Grid ColumnDefinitions="Auto,*,Auto">
-
-          <StackPanel Grid.Column="0"
-                      Orientation="Horizontal"
-                      Spacing="10"
-                      VerticalAlignment="Center">
-            <TextBlock Text="PilotApp"
-                       FontSize="16"
-                       FontWeight="Bold"/>
-            <Border Background="#c0392b"
-                    CornerRadius="10"
-                    Padding="7,2"
-                    IsVisible="{Binding HasOverdueTasks}"
-                    VerticalAlignment="Center">
-              <TextBlock Text="{Binding OverdueTasksCount, StringFormat='{}{0} просрочено'}"
-                         Foreground="White"
-                         FontSize="11"
-                         FontWeight="SemiBold"/>
-            </Border>
+  <Grid RowDefinitions="Auto,*,Auto">
+    <Border Grid.Row="0" Background="#2D2D2D" Padding="12,8">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <Border Background="#4A90D9" CornerRadius="4" Padding="8,4">
+            <TextBlock Text="PMO" Foreground="White" FontWeight="Bold" FontSize="13"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="PilotApp" Foreground="White" FontWeight="SemiBold" FontSize="14"/>
+            <TextBlock Text="Информационная система управления проектами"
+                       Foreground="#AAAAAA" FontSize="10"/>
           </StackPanel>
+        </StackPanel>
 
-          <StackPanel Grid.Column="1"
-                      Orientation="Horizontal"
-                      Spacing="6"
-                      HorizontalAlignment="Center">
-            <Button Content="Поиск  Ctrl+F"
-                    Command="{Binding ToggleSearchCommand}"
-                    FontSize="12"/>
-            <Button Content="Задачи CSV"
-                    Command="{Binding ExportTasksCsvCommand}"
-                    FontSize="12"/>
-            <Button Content="Время CSV"
-                    Command="{Binding ExportTimeCsvCommand}"
-                    FontSize="12"/>
-            <Button Content="Документы CSV"
-                    Command="{Binding ExportDocumentsCsvCommand}"
-                    FontSize="12"/>
-          </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Button Command="{Binding ToggleSearchCommand}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="🔍  Поиск"/>
 
-          <StackPanel Grid.Column="2"
-                      Orientation="Horizontal"
-                      Spacing="8">
-            <StackPanel Orientation="Horizontal"
-                        Spacing="6"
-                        VerticalAlignment="Center">
-              <TextBlock Text="Светлая"
-                         FontSize="12"
-                         VerticalAlignment="Center"
-                         Opacity="0.7"/>
-              <ToggleSwitch IsChecked="{Binding IsDarkTheme, Mode=TwoWay}"
-                            OnContent=""
-                            OffContent=""
-                            VerticalAlignment="Center"/>
-              <TextBlock Text="Тёмная"
-                         FontSize="12"
-                         VerticalAlignment="Center"
-                         Opacity="0.7"/>
-            </StackPanel>
-            <Button Content="Сохранить"
-                    Command="{Binding SaveDataCommand}"
-                    IsEnabled="{Binding !IsBusy}"/>
-            <Button Content="Загрузить"
-                    Command="{Binding LoadDataCommand}"
-                    IsEnabled="{Binding !IsBusy}"/>
-          </StackPanel>
+          <Button Command="{Binding ExportTasksCsvCommand}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="↓ Задачи CSV"/>
 
-        </Grid>
-      </Border>
+          <Button Command="{Binding ExportTimeCsvCommand}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="↓ Время CSV"/>
 
-      <TabControl Grid.Row="1" Margin="8">
+          <Button Command="{Binding ExportDocumentsCsvCommand}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="↓ Документы CSV"/>
+
+          <ToggleSwitch IsChecked="{Binding IsDarkTheme, Mode=TwoWay}"
+                        OffContent="Светлая" OnContent="Тёмная"
+                        Foreground="White">
+            <ToggleSwitch.Resources>
+              <SolidColorBrush x:Key="ToggleSwitchFillOff" Color="#888888"/>
+              <SolidColorBrush x:Key="ToggleSwitchKnobFillOff" Color="White"/>
+              <SolidColorBrush x:Key="ToggleSwitchFillOffPointerOver" Color="#AAAAAA"/>
+              <SolidColorBrush x:Key="ToggleSwitchKnobFillOffPointerOver" Color="White"/>
+            </ToggleSwitch.Resources>
+          </ToggleSwitch>
+
+          <Button Command="{Binding LoadDataCommand}" IsEnabled="{Binding !IsBusy}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="⬇  Загрузить"/>
+
+          <Button Command="{Binding SaveDataCommand}" IsEnabled="{Binding !IsBusy}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="⬆  Сохранить"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="1">
+      <TabControl Margin="8">
         <TabItem Header="{Binding TasksHeader}">
           <views:TasksView DataContext="{Binding Tasks}"/>
         </TabItem>
@@ -103,29 +81,21 @@
         <TabItem Header="{Binding KanbanHeader}">
           <views:KanbanView DataContext="{Binding Kanban}"/>
         </TabItem>
+        <TabItem Header="{Binding DashboardHeader}">
+          <views:DashboardView DataContext="{Binding Dashboard}"/>
+        </TabItem>
       </TabControl>
-
-      <Border Grid.Row="2"
-              Padding="12,6"
-              BorderThickness="0,1,0,0"
-              BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-        <Grid ColumnDefinitions="*,Auto">
-          <TextBlock Grid.Column="0"
-                     Text="{Binding StatusMessage}"
-                     FontSize="12"
-                     Opacity="0.7"
-                     VerticalAlignment="Center"/>
-          <ProgressBar Grid.Column="1"
-                       IsIndeterminate="True"
-                       IsVisible="{Binding IsBusy}"
-                       Width="120"
-                       Height="4"/>
-        </Grid>
-      </Border>
-
+      
+      <views:GlobalSearchView DataContext="{Binding GlobalSearch}"/>
     </Grid>
 
-    <views:GlobalSearchView DataContext="{Binding GlobalSearch}"/>
-
+    <Border Grid.Row="2" Padding="12,6" BorderThickness="0,1,0,0">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Grid.Column="0" Text="{Binding StatusMessage}"
+                   FontSize="12" Opacity="0.7" VerticalAlignment="Center"/>
+        <ProgressBar Grid.Column="1" IsIndeterminate="True"
+                     IsVisible="{Binding IsBusy}" Width="120" Height="4"/>
+      </Grid>
+    </Border>
   </Grid>
 </Window>

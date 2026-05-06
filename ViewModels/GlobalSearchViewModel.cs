@@ -9,9 +9,9 @@ namespace PilotApp.ViewModels;
 
 public partial class GlobalSearchViewModel : ObservableObject
 {
-    private readonly TasksViewModel     _tasks;
+    private readonly TasksViewModel _tasks;
     private readonly DocumentsViewModel _documents;
-    private readonly TimeViewModel      _time;
+    private readonly TimeViewModel _time;
 
     public ObservableCollection<SearchResult> Results { get; } = new();
 
@@ -20,22 +20,22 @@ public partial class GlobalSearchViewModel : ObservableObject
     private string query = string.Empty;
 
     [ObservableProperty] private bool isVisible;
-    [ObservableProperty] private int  totalCount;
+    [ObservableProperty] private int totalCount;
 
     public GlobalSearchViewModel(
-        TasksViewModel     tasks,
+        TasksViewModel tasks,
         DocumentsViewModel documents,
-        TimeViewModel      time)
+        TimeViewModel time)
     {
-        _tasks     = tasks;
+        _tasks = tasks;
         _documents = documents;
-        _time      = time;
+        _time = time;
     }
 
     public void Show()
     {
-        IsVisible  = true;
-        Query      = string.Empty;
+        IsVisible = true;
+        Query = string.Empty;
         Results.Clear();
         TotalCount = 0;
     }
@@ -124,8 +124,8 @@ public partial class GlobalSearchViewModel : ObservableObject
 public enum ResultKind { Task, Comment, Document, TimeEntry }
 
 public sealed record SearchResult(
-    string     Category,
-    string     Title,
-    string     Subtitle,
+    string Category,
+    string Title,
+    string Subtitle,
     ResultKind Kind,
-    object     Source);
+    object Source);

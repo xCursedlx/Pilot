@@ -103,7 +103,6 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </ScrollViewer>
-
       </Grid>
     </Border>
   </Grid>

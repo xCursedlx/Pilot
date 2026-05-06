@@ -12,15 +12,15 @@ namespace PilotApp.ViewModels;
 
 public partial class TasksViewModel : ObservableObject
 {
-    private Action?         _markDirty;
+    private Action? _markDirty;
     private IDialogService? _dialog;
 
-    public void SetDirtyCallback(Action markDirty)      => _markDirty = markDirty;
-    public void SetDialogService(IDialogService dialog)  => _dialog    = dialog;
+    public void SetDirtyCallback(Action markDirty) => _markDirty = markDirty;
+    public void SetDialogService(IDialogService dialog) => _dialog = dialog;
 
     public ObservableCollection<TaskItem> Tasks { get; } = new();
 
-    public IReadOnlyList<AppTaskStatus>   Statuses   { get; } = Enum.GetValues<AppTaskStatus>();
+    public IReadOnlyList<AppTaskStatus> Statuses { get; } = Enum.GetValues<AppTaskStatus>();
     public IReadOnlyList<AppTaskPriority> Priorities { get; } = Enum.GetValues<AppTaskPriority>();
 
     [ObservableProperty]
@@ -34,12 +34,11 @@ public partial class TasksViewModel : ObservableObject
         NewCommentText = string.Empty;
         OnPropertyChanged(nameof(SelectedComments));
         OnPropertyChanged(nameof(SelectedStatusHistory));
-        OnFilterChanged();
     }
 
-    [ObservableProperty] private string         filterText    = string.Empty;
+    [ObservableProperty] private string filterText = string.Empty;
     [ObservableProperty] private AppTaskStatus? filterStatus;
-    [ObservableProperty] private string         filterProject = string.Empty;
+    [ObservableProperty] private string filterProject = string.Empty;
 
     public IReadOnlyList<AppTaskStatus?> FilterStatuses { get; } =
         new AppTaskStatus?[] { null }
@@ -55,7 +54,7 @@ public partial class TasksViewModel : ObservableObject
             (string.IsNullOrWhiteSpace(FilterProject) ||
              (t.Project ?? "").Contains(FilterProject, StringComparison.OrdinalIgnoreCase)));
 
-    public IEnumerable<TaskComment>        SelectedComments      => SelectedTask?.Comments      ?? Enumerable.Empty<TaskComment>();
+    public IEnumerable<TaskComment> SelectedComments => SelectedTask?.Comments ?? Enumerable.Empty<TaskComment>();
     public IEnumerable<StatusHistoryEntry> SelectedStatusHistory => SelectedTask?.StatusHistory ?? Enumerable.Empty<StatusHistoryEntry>();
 
     [ObservableProperty]
@@ -69,8 +68,8 @@ public partial class TasksViewModel : ObservableObject
     {
         var t = new TaskItem
         {
-            Title    = "Новая задача",
-            DueDate  = DateTime.Today.AddDays(7),
+            Title = "Новая задача",
+            DueDate = DateTime.Today.AddDays(7),
             Priority = AppTaskPriority.Medium
         };
         Tasks.Add(t);
@@ -128,8 +127,8 @@ public partial class TasksViewModel : ObservableObject
         if (SelectedTask is null) return;
         SelectedTask.Comments.Add(new TaskComment
         {
-            Author    = string.IsNullOrWhiteSpace(NewCommentAuthor) ? "Аноним" : NewCommentAuthor.Trim(),
-            Text      = NewCommentText.Trim(),
+            Author = string.IsNullOrWhiteSpace(NewCommentAuthor) ? "Аноним" : NewCommentAuthor.Trim(),
+            Text = NewCommentText.Trim(),
             CreatedAt = DateTime.Now
         });
         NewCommentText = string.Empty;
@@ -137,13 +136,13 @@ public partial class TasksViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedComments));
     }
 
-    private bool CanModify()     => SelectedTask is not null;
+    private bool CanModify() => SelectedTask is not null;
     private bool CanAddComment() => SelectedTask is not null && !string.IsNullOrWhiteSpace(NewCommentText);
 
-    partial void OnFilterTextChanged(string value)        => OnFilterChanged();
+    partial void OnFilterTextChanged(string value) => OnFilterChanged();
     partial void OnFilterStatusChanged(AppTaskStatus? value) => OnFilterChanged();
-    partial void OnFilterProjectChanged(string value)     => OnFilterChanged();
-    partial void OnNewCommentTextChanged(string value)    => AddCommentCommand.NotifyCanExecuteChanged();
+    partial void OnFilterProjectChanged(string value) => OnFilterChanged();
+    partial void OnNewCommentTextChanged(string value) => AddCommentCommand.NotifyCanExecuteChanged();
 
     private void OnFilterChanged() => OnPropertyChanged(nameof(FilteredTasks));
 

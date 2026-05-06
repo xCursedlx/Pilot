@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,10 +13,10 @@ public partial class KanbanViewModel : ObservableObject
 {
     private readonly TasksViewModel _tasksVm;
 
-    public KanbanColumn New        { get; } = new(AppTaskStatus.New,        "Новые");
+    public KanbanColumn New { get; } = new(AppTaskStatus.New, "Новые");
     public KanbanColumn InProgress { get; } = new(AppTaskStatus.InProgress, "В работе");
-    public KanbanColumn OnReview   { get; } = new(AppTaskStatus.OnReview,   "На проверке");
-    public KanbanColumn Done       { get; } = new(AppTaskStatus.Done,       "Готово");
+    public KanbanColumn OnReview { get; } = new(AppTaskStatus.OnReview, "На проверке");
+    public KanbanColumn Done { get; } = new(AppTaskStatus.Done, "Готово");
 
     public IReadOnlyList<KanbanColumn> Columns { get; }
 
@@ -23,9 +25,33 @@ public partial class KanbanViewModel : ObservableObject
     public KanbanViewModel(TasksViewModel tasksVm)
     {
         _tasksVm = tasksVm;
-        Columns  = new[] { New, InProgress, OnReview, Done };
-        _tasksVm.Tasks.CollectionChanged += (_, _) => Reload();
+        Columns = new[] { New, InProgress, OnReview, Done };
+
+        _tasksVm.Tasks.CollectionChanged += OnTasksCollectionChanged;
+
+        foreach (var task in _tasksVm.Tasks)
+            task.PropertyChanged += OnTaskPropertyChanged;
+
         Reload();
+    }
+
+    private void OnTasksCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+            foreach (TaskItem t in e.NewItems)
+                t.PropertyChanged += OnTaskPropertyChanged;
+
+        if (e.OldItems != null)
+            foreach (TaskItem t in e.OldItems)
+                t.PropertyChanged -= OnTaskPropertyChanged;
+
+        Reload();
+    }
+
+    private void OnTaskPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(TaskItem.Status) or nameof(TaskItem.Priority))
+            Reload();
     }
 
     public void Reload()
@@ -60,8 +86,8 @@ public partial class KanbanViewModel : ObservableObject
 
 public partial class KanbanColumn : ObservableObject
 {
-    public AppTaskStatus                 Status { get; }
-    public string                        Title  { get; }
+    public AppTaskStatus Status { get; }
+    public string Title { get; }
     public ObservableCollection<TaskItem> Items { get; } = new();
 
     [ObservableProperty] private string countLabel = "";
@@ -69,7 +95,7 @@ public partial class KanbanColumn : ObservableObject
     public KanbanColumn(AppTaskStatus status, string title)
     {
         Status = status;
-        Title  = title;
+        Title = title;
     }
 
     public void RefreshCount() =>

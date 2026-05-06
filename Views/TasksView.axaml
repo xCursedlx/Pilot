@@ -6,79 +6,72 @@
              x:Class="PilotApp.Views.TasksView">
 
   <Grid RowDefinitions="Auto,*" Margin="12">
-
-    <WrapPanel Grid.Row="0"
-               Orientation="Horizontal"
-               Margin="0,0,0,10">
-      <Button Content="Добавить"
-              Command="{Binding AddTaskCommand}"
-              Margin="0,0,6,4"/>
-      <Button Content="Удалить"
-              Command="{Binding DeleteTaskCommand}"
-              Margin="0,0,12,4"/>
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+      <Button Content="+ Добавить" Command="{Binding AddTaskCommand}"/>
+      <Button Content="Удалить" Command="{Binding DeleteTaskCommand}"/>
       <TextBox Watermark="Поиск по названию / исполнителю"
-               Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-               Width="220"
-               Margin="0,0,6,4"/>
-      <TextBox Watermark="Фильтр по проекту"
-               Text="{Binding FilterProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-               Width="160"
-               Margin="0,0,6,4"/>
+               Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
       <ComboBox ItemsSource="{Binding FilterStatuses}"
-                SelectedItem="{Binding FilterStatus, Mode=TwoWay}"
-                Width="160"
-                Margin="0,0,0,4">
+                SelectedItem="{Binding FilterStatus, Mode=TwoWay}" Width="150">
         <ComboBox.ItemTemplate>
           <DataTemplate>
             <TextBlock Text="{Binding Converter={StaticResource TaskStatusConverter}}"/>
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>
-    </WrapPanel>
+      <TextBox Watermark="Фильтр по проекту"
+               Text="{Binding FilterProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               Width="160"/>
+    </StackPanel>
 
     <Grid Grid.Row="1" ColumnDefinitions="2*,3*">
-
       <ListBox Grid.Column="0"
                Margin="0,0,10,0"
                ItemsSource="{Binding FilteredTasks}"
                SelectedItem="{Binding SelectedTask, Mode=TwoWay}">
         <ListBox.ItemTemplate>
-          <DataTemplate DataType="models:TaskItem">
+          <DataTemplate>
             <Grid ColumnDefinitions="*,Auto" Margin="4,3">
               <StackPanel Grid.Column="0" Spacing="2">
                 <TextBlock Text="{Binding Title}"
                            FontWeight="SemiBold"
                            TextTrimming="CharacterEllipsis"/>
                 <TextBlock Text="{Binding Assignee}"
-                           FontSize="11"
-                           Opacity="0.6"
+                           FontSize="11" Opacity="0.6"
                            IsVisible="{Binding Assignee,
                              Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                <TextBlock Text="{Binding Project, StringFormat='/ {0}'}"
-                           FontSize="11"
-                           Opacity="0.55"
+                <TextBlock Text="{Binding Project}"
+                           FontSize="11" Opacity="0.5"
                            IsVisible="{Binding Project,
                              Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                <TextBlock Text="{Binding DueDate, StringFormat='{}{0:dd.MM.yyyy}'}"
-                           FontSize="11"
+                <TextBlock FontSize="11"
                            Foreground="{Binding DueDate,
                              Converter={StaticResource DueDateColorConverter}}"
                            IsVisible="{Binding DueDate,
-                             Converter={x:Static ObjectConverters.IsNotNull}}"/>
-              </StackPanel>
-              <Border Grid.Column="1"
-                      Background="{Binding Priority,
-                        Converter={StaticResource TaskPriorityConverter},
-                        ConverterParameter=color}"
-                      CornerRadius="4"
-                      Padding="6,2"
-                      VerticalAlignment="Top"
-                      Margin="6,0,0,0">
+                             Converter={x:Static ObjectConverters.IsNotNull}}">
+                  <TextBlock.Text>
+                    <MultiBinding StringFormat=" {0:dd.MM.yyyy}">
+                      <Binding Path="DueDate"/>
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+                
                 <TextBlock Text="{Binding Priority,
                              Converter={StaticResource TaskPriorityConverter}}"
                            FontSize="10"
-                           FontWeight="SemiBold"
-                           Foreground="White"/>
+                           Foreground="{Binding Priority,
+                             Converter={StaticResource TaskPriorityConverter},
+                             ConverterParameter=color}"
+                           Opacity="0.85"/>
+              </StackPanel>
+              <Border Grid.Column="1"
+                      Background="{Binding Status,
+                        Converter={StaticResource TaskStatusColorConverter}}"
+                      CornerRadius="4" Padding="6,2"
+                      VerticalAlignment="Top" Margin="6,0,0,0">
+                <TextBlock Text="{Binding Status,
+                             Converter={StaticResource TaskStatusConverter}}"
+                           Foreground="White" FontSize="11" FontWeight="SemiBold"/>
               </Border>
             </Grid>
           </DataTemplate>
@@ -86,185 +79,101 @@
       </ListBox>
 
       <ScrollViewer Grid.Column="1">
-        <StackPanel Spacing="10"
-                    IsEnabled="{Binding SelectedTask,
-                      Converter={x:Static ObjectConverters.IsNotNull}}">
+        <StackPanel Spacing="8"
+                    IsEnabled="{Binding SelectedTask,Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Margin="4,0,0,0">
+          <TextBlock Text="Карточка задачи" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
 
-          <TextBlock Text="Основное"
-                     FontWeight="SemiBold"
-                     FontSize="13"
-                     Opacity="0.7"/>
+          <TextBlock Text="Название"/>
+          <TextBox Text="{Binding SelectedTask.Title, Mode=TwoWay}"/>
 
-          <StackPanel Spacing="4">
-            <TextBlock Text="Название" FontSize="11" Opacity="0.6"/>
-            <TextBox Text="{Binding SelectedTask.Title, Mode=TwoWay}"
-                     Watermark="Название задачи"/>
-          </StackPanel>
+          <TextBlock Text="Описание"/>
+          <TextBox Text="{Binding SelectedTask.Description, Mode=TwoWay}"
+                   AcceptsReturn="True" MinHeight="60"/>
 
-          <StackPanel Spacing="4">
-            <TextBlock Text="Описание" FontSize="11" Opacity="0.6"/>
-            <TextBox Text="{Binding SelectedTask.Description, Mode=TwoWay}"
-                     Watermark="Описание"
-                     AcceptsReturn="True"
-                     Height="64"/>
-          </StackPanel>
+          <TextBlock Text="Исполнитель"/>
+          <TextBox Text="{Binding SelectedTask.Assignee, Mode=TwoWay}" Watermark="Имя сотрудника"/>
 
-          <Grid ColumnDefinitions="*,*">
-            <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
-              <TextBlock Text="Исполнитель" FontSize="11" Opacity="0.6"/>
-              <TextBox Text="{Binding SelectedTask.Assignee, Mode=TwoWay}"
-                       Watermark="Имя исполнителя"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Spacing="4">
-              <TextBlock Text="Проект" FontSize="11" Opacity="0.6"/>
-              <TextBox Text="{Binding SelectedTask.Project, Mode=TwoWay}"
-                       Watermark="Название проекта"/>
-            </StackPanel>
-          </Grid>
+          <TextBlock Text="Проект"/>
+          <TextBox Text="{Binding SelectedTask.Project, Mode=TwoWay}" Watermark="Название проекта"/>
 
-          <Grid ColumnDefinitions="*,*">
-            <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,6,0">
-              <TextBlock Text="Срок" FontSize="11" Opacity="0.6"/>
-              <CalendarDatePicker SelectedDate="{Binding SelectedTask.DueDate, Mode=TwoWay}"/>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Spacing="4">
-              <TextBlock Text="Приоритет" FontSize="11" Opacity="0.6"/>
-              <ComboBox ItemsSource="{Binding Priorities}"
-                        SelectedItem="{Binding SelectedTask.Priority, Mode=TwoWay}"
-                        HorizontalAlignment="Stretch">
-                <ComboBox.ItemTemplate>
-                  <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource TaskPriorityConverter}}"/>
-                  </DataTemplate>
-                </ComboBox.ItemTemplate>
-              </ComboBox>
-            </StackPanel>
-          </Grid>
+          <TextBlock Text="Срок выполнения"/>
+          <CalendarDatePicker SelectedDate="{Binding SelectedTask.DueDate, Mode=TwoWay}"/>
 
-          <StackPanel Spacing="4">
-            <TextBlock Text="Статус" FontSize="11" Opacity="0.6"/>
-            <StackPanel Orientation="Horizontal" Spacing="6">
-              <ComboBox ItemsSource="{Binding Statuses}"
-                        SelectedItem="{Binding SelectedTask.Status, Mode=TwoWay}"
-                        Width="160">
-                <ComboBox.ItemTemplate>
-                  <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource TaskStatusConverter}}"/>
-                  </DataTemplate>
-                </ComboBox.ItemTemplate>
-              </ComboBox>
-              <Button Content="Сохранить"
-                      Command="{Binding SaveTaskCommand}"/>
-            </StackPanel>
-          </StackPanel>
+          <TextBlock Text="Статус"/>
+          <ComboBox ItemsSource="{Binding Statuses}"
+                    SelectedItem="{Binding SelectedTask.Status, Mode=TwoWay}"
+                    HorizontalAlignment="Stretch">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Border Width="10" Height="10" CornerRadius="5"
+                          VerticalAlignment="Center"
+                          Background="{Binding Converter={StaticResource TaskStatusColorConverter}}"/>
+                  <TextBlock Text="{Binding Converter={StaticResource TaskStatusConverter}}"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
 
-          <Expander Header="История статусов"
-                    IsExpanded="False"
-                    Margin="0,4,0,0">
-            <ItemsControl ItemsSource="{Binding SelectedStatusHistory}"
-                          Margin="0,6,0,0">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="models:StatusHistoryEntry">
-                  <Border Padding="8,6"
-                          Margin="0,0,0,4"
-                          CornerRadius="4"
-                          BorderThickness="1"
-                          BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
-                          Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
-                    <Grid ColumnDefinitions="*,Auto">
-                      <StackPanel Grid.Column="0" Spacing="2">
-                        <TextBlock FontSize="12">
-                          <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0}  -&gt;  {1}">
-                              <Binding Path="OldStatus"
-                                       Converter="{StaticResource TaskStatusConverter}"/>
-                              <Binding Path="NewStatus"
-                                       Converter="{StaticResource TaskStatusConverter}"/>
-                            </MultiBinding>
-                          </TextBlock.Text>
-                        </TextBlock>
-                        <TextBlock Text="{Binding ChangedBy, StringFormat='@ {0}'}"
-                                   FontSize="11"
-                                   Opacity="0.6"
-                                   IsVisible="{Binding ChangedBy,
-                                     Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                      </StackPanel>
-                      <TextBlock Grid.Column="1"
-                                 Text="{Binding ChangedAt, StringFormat='{}{0:dd.MM HH:mm}'}"
-                                 FontSize="11"
-                                 Opacity="0.5"
-                                 VerticalAlignment="Center"/>
-                    </Grid>
-                  </Border>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </Expander>
+          <TextBlock Text="Приоритет"/>
+          <ComboBox ItemsSource="{Binding Priorities}"
+                    SelectedItem="{Binding SelectedTask.Priority, Mode=TwoWay}"
+                    HorizontalAlignment="Stretch">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Border Width="10" Height="10" CornerRadius="5"
+                          VerticalAlignment="Center"
+                          Background="{Binding Converter={StaticResource TaskPriorityConverter},
+                            ConverterParameter=color}"/>
+                  <TextBlock Text="{Binding Converter={StaticResource TaskPriorityConverter}}"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
 
-          <Expander Header="Комментарии"
-                    IsExpanded="True"
-                    Margin="0,4,0,0">
-            <StackPanel Spacing="8" Margin="0,6,0,0">
+          <Button Content="Применить изменения"
+                  Command="{Binding SaveTaskCommand}"
+                  HorizontalAlignment="Right" Margin="0,8,0,0"/>
 
-              <ItemsControl ItemsSource="{Binding SelectedComments}">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate DataType="models:TaskComment">
-                    <Border Padding="10,8"
-                            Margin="0,0,0,6"
-                            CornerRadius="6"
-                            BorderThickness="1"
-                            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
-                            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
-                      <StackPanel Spacing="4">
-                        <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0"
-                                     Text="{Binding Author}"
-                                     FontWeight="SemiBold"
-                                     FontSize="12"/>
-                          <TextBlock Grid.Column="1"
-                                     Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM HH:mm}'}"
-                                     FontSize="11"
-                                     Opacity="0.5"/>
-                        </Grid>
-                        <TextBlock Text="{Binding Text}"
-                                   FontSize="13"
-                                   TextWrapping="Wrap"/>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
+          <Separator Margin="0,8,0,4"/>
+          <TextBlock Text="Комментарии" FontSize="13" FontWeight="SemiBold"/>
 
-              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Text="Автор"
-                           FontSize="11"
-                           Opacity="0.6"
-                           Margin="0,0,8,2"/>
-                <TextBlock Grid.Row="0" Grid.Column="1"
-                           Text="Комментарий"
-                           FontSize="11"
-                           Opacity="0.6"/>
-                <TextBox Grid.Row="1" Grid.Column="0"
-                         Text="{Binding NewCommentAuthor, Mode=TwoWay}"
-                         Watermark="Ваше имя"
-                         Width="120"
-                         Margin="0,0,8,0"/>
-                <TextBox Grid.Row="1" Grid.Column="1"
-                         Text="{Binding NewCommentText, Mode=TwoWay,
-                                UpdateSourceTrigger=PropertyChanged}"
-                         Watermark="Текст комментария"/>
-              </Grid>
+          <ItemsControl ItemsSource="{Binding SelectedComments}" x:CompileBindings="False">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="models:TaskComment">
+                <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                        BorderThickness="1" CornerRadius="4"
+                        Padding="10,8" Margin="0,0,0,6">
+                  <StackPanel Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{Binding Author}"
+                                 FontWeight="SemiBold" FontSize="12"/>
+                      <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
+                                 FontSize="11" Opacity="0.6" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="12"/>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
 
-              <Button Content="Добавить комментарий"
-                      Command="{Binding AddCommentCommand}"
-                      HorizontalAlignment="Left"/>
-            </StackPanel>
-          </Expander>
-
+          <TextBlock Text="Автор"/>
+          <TextBox Text="{Binding NewCommentAuthor, Mode=TwoWay}"
+                   Watermark="Имя автора"/>
+          <TextBlock Text="Комментарий"/>
+          <TextBox Text="{Binding NewCommentText, Mode=TwoWay}"
+                   Watermark="Текст комментария"
+                   AcceptsReturn="True" MinHeight="60"/>
+          <Button Content="Добавить комментарий"
+                  Command="{Binding AddCommentCommand}"
+                  HorizontalAlignment="Right"/>
         </StackPanel>
       </ScrollViewer>
-
     </Grid>
   </Grid>
 </UserControl>

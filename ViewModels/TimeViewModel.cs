@@ -12,13 +12,13 @@ namespace PilotApp.ViewModels;
 
 public partial class TimeViewModel : ObservableObject
 {
-    private Action?         _markDirty;
+    private Action? _markDirty;
     private IDialogService? _dialog;
     private TasksViewModel? _tasksVm;
 
-    public void SetDirtyCallback(Action markDirty)      => _markDirty = markDirty;
-    public void SetDialogService(IDialogService dialog)  => _dialog    = dialog;
-    public void SetTasksSource(TasksViewModel tasks)     => _tasksVm   = tasks;
+    public void SetDirtyCallback(Action markDirty) => _markDirty = markDirty;
+    public void SetDialogService(IDialogService dialog) => _dialog = dialog;
+    public void SetTasksSource(TasksViewModel tasks) => _tasksVm = tasks;
 
     public ObservableCollection<TimeEntry> Entries { get; } = new();
 
@@ -26,12 +26,12 @@ public partial class TimeViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteEntryCommand))]
     private TimeEntry? selectedEntry;
 
-    [ObservableProperty] private string   newTaskTitle = string.Empty;
-    [ObservableProperty] private string   newUser      = string.Empty;
-    [ObservableProperty] private DateTime newDate      = DateTime.Today;
-    [ObservableProperty] private double   newHours;
-    [ObservableProperty] private string   newComment   = string.Empty;
-    [ObservableProperty] private string   filterUser   = string.Empty;
+    [ObservableProperty] private string newTaskTitle = string.Empty;
+    [ObservableProperty] private string newUser = string.Empty;
+    [ObservableProperty] private DateTime newDate = DateTime.Today;
+    [ObservableProperty] private double newHours;
+    [ObservableProperty] private string newComment = string.Empty;
+    [ObservableProperty] private string filterUser = string.Empty;
 
     public IEnumerable<TimeEntry> FilteredEntries =>
         Entries.Where(e =>
@@ -58,19 +58,19 @@ public partial class TimeViewModel : ObservableObject
 
         var entry = new TimeEntry
         {
-            TaskId    = matched?.Id,
+            TaskId = matched?.Id,
             TaskTitle = NewTaskTitle.Trim(),
-            User      = NewUser.Trim(),
-            Date      = NewDate,
-            Hours     = NewHours,
-            Comment   = string.IsNullOrWhiteSpace(NewComment) ? null : NewComment.Trim()
+            User = NewUser.Trim(),
+            Date = NewDate,
+            Hours = NewHours,
+            Comment = string.IsNullOrWhiteSpace(NewComment) ? null : NewComment.Trim()
         };
         Entries.Add(entry);
         _markDirty?.Invoke();
         RefreshAll();
         NewTaskTitle = string.Empty;
-        NewHours     = 0;
-        NewComment   = string.Empty;
+        NewHours = 0;
+        NewComment = string.Empty;
     }
 
     private bool CanAdd() => !string.IsNullOrWhiteSpace(NewTaskTitle) && NewHours > 0;
@@ -97,9 +97,9 @@ public partial class TimeViewModel : ObservableObject
 
     private bool CanDelete() => SelectedEntry is not null;
 
-    partial void OnFilterUserChanged(string value)  => RefreshAll();
+    partial void OnFilterUserChanged(string value) => RefreshAll();
     partial void OnNewTaskTitleChanged(string value) => AddEntryCommand.NotifyCanExecuteChanged();
-    partial void OnNewHoursChanged(double value)     => AddEntryCommand.NotifyCanExecuteChanged();
+    partial void OnNewHoursChanged(double value) => AddEntryCommand.NotifyCanExecuteChanged();
 
     private void RefreshAll()
     {

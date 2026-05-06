@@ -4,13 +4,14 @@
              x:Class="PilotApp.App">
 
     <Application.Resources>
-        <conv:TaskStatusConverter   x:Key="TaskStatusConverter"/>
-        <conv:DueDateColorConverter x:Key="DueDateColorConverter"/>
+        <conv:TaskStatusConverter x:Key="TaskStatusConverter"/>
+        <conv:TaskStatusColorConverter x:Key="TaskStatusColorConverter"/>
         <conv:TaskPriorityConverter x:Key="TaskPriorityConverter"/>
+        <conv:DueDateColorConverter x:Key="DueDateColorConverter"/>
     </Application.Resources>
 
     <Application.Styles>
-        <FluentTheme/>
+        <FluentTheme />
     </Application.Styles>
 
 </Application>

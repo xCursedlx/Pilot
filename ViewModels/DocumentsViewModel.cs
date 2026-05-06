@@ -12,17 +12,50 @@ namespace PilotApp.ViewModels;
 
 public partial class DocumentsViewModel : ObservableObject
 {
-    private Action?         _markDirty;
+    private Action? _markDirty;
     private IDialogService? _dialog;
+    private TasksViewModel? _tasksVm;
 
-    public void SetDirtyCallback(Action markDirty)      => _markDirty = markDirty;
-    public void SetDialogService(IDialogService dialog)  => _dialog    = dialog;
+    public void SetDirtyCallback(Action markDirty) => _markDirty = markDirty;
+    public void SetDialogService(IDialogService dialog) => _dialog = dialog;
+
+    public void SetTasksSource(TasksViewModel tasks)
+    {
+        _tasksVm = tasks;
+        _tasksVm.Tasks.CollectionChanged += (_, _) => OnPropertyChanged(nameof(AvailableTasks));
+    }
+
+    public IEnumerable<TaskItem> AvailableTasks =>
+        _tasksVm?.Tasks ?? Enumerable.Empty<TaskItem>();
+
+    [ObservableProperty]
+    private TaskItem? selectedLinkedTask;
+
+    partial void OnSelectedLinkedTaskChanged(TaskItem? value)
+    {
+        if (SelectedDocument is null) return;
+        SelectedDocument.LinkedTaskId = value?.Id.ToString();
+        _markDirty?.Invoke();
+    }
 
     public ObservableCollection<DocumentItem> Documents { get; } = new();
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DeleteDocumentCommand))]
     private DocumentItem? selectedDocument;
+
+    partial void OnSelectedDocumentChanged(DocumentItem? value)
+    {
+        if (value is null)
+        {
+            SelectedLinkedTask = null;
+            return;
+        }
+        if (Guid.TryParse(value.LinkedTaskId, out var id))
+            SelectedLinkedTask = _tasksVm?.Tasks.FirstOrDefault(t => t.Id == id);
+        else
+            SelectedLinkedTask = null;
+    }
 
     [ObservableProperty] private string filterText = string.Empty;
 
@@ -37,8 +70,8 @@ public partial class DocumentsViewModel : ObservableObject
     {
         var d = new DocumentItem
         {
-            Name      = "Новый документ",
-            Version   = GetNextVersion(),
+            Name = "Новый документ",
+            Version = GetNextVersion(),
             CreatedAt = DateTime.Now
         };
         Documents.Add(d);
@@ -92,7 +125,7 @@ public partial class DocumentsViewModel : ObservableObject
         if (SelectedDocument is null) return;
         var dialog = new Avalonia.Platform.Storage.FilePickerOpenOptions
         {
-            Title         = "Выберите файл документа",
+            Title = "Выберите файл документа",
             AllowMultiple = false
         };
         var topLevel = FilePickerHelper.TopLevel;

@@ -26,6 +26,9 @@ build_property.EnableCodeStyleSeverity =
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/DashboardView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/DocumentsView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

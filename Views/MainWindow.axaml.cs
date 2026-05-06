@@ -8,37 +8,22 @@ namespace PilotApp.Views;
 
 public partial class MainWindow : Window
 {
-    private bool _isClosing;
-
     public MainWindow()
     {
         InitializeComponent();
         FilePickerHelper.TopLevel = TopLevel.GetTopLevel(this);
-
         var repo = new JsonRepository(Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "PilotApp", "data.json"));
-
         var vm = new MainWindowViewModel(repo);
         DataContext = vm;
         _ = vm.LoadDataCommand.ExecuteAsync(null);
-
-        vm.StatusMessage = $"Готово  |  бэкапы: {repo.BackupDirectory}";
-
         Closing += async (_, e) =>
         {
-            if (_isClosing) return;
-            e.Cancel    = true;
-            _isClosing  = true;
-            try
-            {
-                await vm.SaveDataCommand.ExecuteAsync(null);
-            }
-            finally
-            {
-                vm.Dispose();
-                Close();
-            }
+            e.Cancel = true;
+            await vm.SaveDataCommand.ExecuteAsync(null);
+            Closing -= null;
+            Close();
         };
     }
 }
