@@ -1,0 +1,145 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PilotApp.ViewModels"
+             x:DataType="vm:DashboardViewModel"
+             x:CompileBindings="False"
+             x:Class="PilotApp.Views.DashboardView">
+
+  <ScrollViewer>
+    <StackPanel Margin="16" Spacing="16">
+      <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="12">
+        <Border Grid.Column="0" CornerRadius="8" Padding="16,14" BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Всего задач" FontSize="12" Opacity="0.6"/>
+            <TextBlock Text="{Binding TotalTasks}" FontSize="32" FontWeight="Bold"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" CornerRadius="8" Padding="16,14"
+                BorderThickness="1" BorderBrush="#1E88E5">
+          <StackPanel Spacing="6">
+            <TextBlock Text="В работе" FontSize="12" Opacity="0.6"/>
+            <TextBlock Text="{Binding InProgressCount}" FontSize="32"
+                       FontWeight="Bold" Foreground="#1E88E5"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="2" CornerRadius="8" Padding="16,14"
+                BorderThickness="1" BorderBrush="#d32f2f">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Просрочено" FontSize="12" Opacity="0.6"/>
+            <TextBlock Text="{Binding OverdueCount}" FontSize="32"
+                       FontWeight="Bold" Foreground="#d32f2f"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="3" CornerRadius="8" Padding="16,14" BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Документов" FontSize="12" Opacity="0.6"/>
+            <TextBlock Text="{Binding TotalDocuments}" FontSize="32" FontWeight="Bold"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="4" CornerRadius="8" Padding="16,14"
+                BorderThickness="1" BorderBrush="#43A047">
+          <StackPanel Spacing="6">
+            <TextBlock Text="Часов учтено" FontSize="12" Opacity="0.6"/>
+            <TextBlock Text="{Binding TotalHours, StringFormat='{}{0:0.#} ч'}"
+                       FontSize="32" FontWeight="Bold" Foreground="#43A047"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,*,2*" ColumnSpacing="12">
+        <Border Grid.Column="0" CornerRadius="8" Padding="16" BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="По статусам" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ItemsControl ItemsSource="{Binding StatusSummaries}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,8">
+                    <Border Grid.Column="0" Width="12" Height="12" CornerRadius="6"
+                            VerticalAlignment="Center" Margin="0,0,10,0"
+                            Background="{Binding Color}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Label}"
+                               VerticalAlignment="Center" FontSize="13"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Count}"
+                               FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="1" CornerRadius="8" Padding="16" BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Топ по часам" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ItemsControl ItemsSource="{Binding TopAssignees}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                    <TextBlock Grid.Column="0" Text="{Binding Name}"
+                               VerticalAlignment="Center" FontSize="13"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Border Grid.Column="1" Background="#43A047" CornerRadius="4"
+                            Padding="8,2" Margin="8,0,0,0">
+                      <TextBlock Text="{Binding Hours, StringFormat='{}{0:0.#} ч'}"
+                                 Foreground="White" FontSize="11" FontWeight="SemiBold"/>
+                    </Border>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="Нет записей" FontSize="12" Opacity="0.5"
+                       IsVisible="{Binding HasNoAssignees}"/>
+          </StackPanel>
+        </Border>
+
+        <Border Grid.Column="2" CornerRadius="8" Padding="16" BorderThickness="1"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Дедлайны (ближайшие 7 дней)" FontSize="14"
+                       FontWeight="SemiBold" Margin="0,0,0,4"/>
+            <ItemsControl ItemsSource="{Binding UpcomingDeadlines}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+                    <TextBlock Grid.Column="0" Text="{Binding Title}"
+                               VerticalAlignment="Center" FontSize="13"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding DueDate, StringFormat='{}{0:dd.MM}'}"
+                               FontSize="11" Opacity="0.6"
+                               VerticalAlignment="Center" Margin="8,0,8,0"/>
+                    <Border Grid.Column="2"
+                            Background="{Binding Priority,
+                              Converter={StaticResource TaskPriorityConverter},
+                              ConverterParameter=color}"
+                            CornerRadius="4" Padding="6,2">
+                      <TextBlock Text="{Binding Priority,
+                                   Converter={StaticResource TaskPriorityConverter}}"
+                                 Foreground="White" FontSize="10"/>
+                    </Border>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="Нет задач с дедлайном в ближайшие 7 дней"
+                       FontSize="12" Opacity="0.5"
+                       IsVisible="{Binding HasNoUpcomingDeadlines}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
