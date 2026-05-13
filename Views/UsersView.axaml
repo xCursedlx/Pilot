@@ -1,0 +1,134 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PilotApp.ViewModels"
+             xmlns:models="clr-namespace:PilotApp.Models"
+             x:DataType="vm:UsersViewModel"
+             x:Class="PilotApp.Views.UsersView">
+
+  <Grid ColumnDefinitions="*,Auto" Margin="12">
+
+    <Grid Grid.Column="0" RowDefinitions="Auto,*">
+      <TextBlock Grid.Row="0" Text="Пользователи системы"
+                 FontSize="15" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+      <ListBox Grid.Row="1"
+               ItemsSource="{Binding Users}"
+               SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+          <DataTemplate DataType="models:UserAccount">
+            <Grid ColumnDefinitions="*,Auto,Auto" Margin="4,4">
+              <StackPanel Grid.Column="0" Spacing="2">
+                <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="13"/>
+                <TextBlock FontSize="11" Opacity="0.6">
+                  <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} · {1}">
+                      <Binding Path="Login"/>
+                      <Binding Path="Role"/>
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+              </StackPanel>
+              <Border Grid.Column="1"
+                      CornerRadius="4" Padding="6,2" Margin="8,0,0,0"
+                      VerticalAlignment="Center"
+                      Background="{Binding IsActive,
+                        Converter={StaticResource AuditSuccessColorConverter}}">
+                <TextBlock FontSize="10" Foreground="White"
+                           Text="{Binding IsActive,
+                             Converter={StaticResource BoolToStringConverter},
+                             ConverterParameter='Активен|Заблокирован'}"/>
+              </Border>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
+
+    <Border Grid.Column="1" Width="300" Margin="12,0,0,0"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+            BorderThickness="1" Padding="14">
+      <StackPanel Spacing="10">
+
+        <TextBlock Text="Новый пользователь" FontSize="14" FontWeight="SemiBold"/>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Логин" FontSize="11" Opacity="0.7"/>
+          <TextBox Text="{Binding NewLogin, Mode=TwoWay}" Watermark="username"/>
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Пароль" FontSize="11" Opacity="0.7"/>
+          <TextBox Text="{Binding NewPassword, Mode=TwoWay}"
+                   PasswordChar="●" Watermark="Минимум 6 символов"/>
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Отображаемое имя" FontSize="11" Opacity="0.7"/>
+          <TextBox Text="{Binding NewDisplayName, Mode=TwoWay}" Watermark="Иванов И.И."/>
+        </StackPanel>
+
+        <StackPanel Spacing="4">
+          <TextBlock Text="Роль" FontSize="11" Opacity="0.7"/>
+          <ComboBox ItemsSource="{Binding Roles}"
+                    SelectedItem="{Binding NewRole, Mode=TwoWay}"
+                    HorizontalAlignment="Stretch"/>
+        </StackPanel>
+
+        <TextBlock Text="{Binding ErrorMessage}"
+                   Foreground="#d32f2f" FontSize="11"
+                   TextWrapping="Wrap"
+                   IsVisible="{Binding ErrorMessage,
+                     Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+        <Button Content="Создать пользователя"
+                Command="{Binding AddUserCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"/>
+
+        <Separator/>
+
+        <TextBlock Text="Редактирование" FontSize="13" FontWeight="SemiBold"/>
+
+        <StackPanel Spacing="4"
+                    IsEnabled="{Binding SelectedUser,
+                      Converter={x:Static ObjectConverters.IsNotNull}}">
+          <TextBlock Text="Отображаемое имя" FontSize="11" Opacity="0.7"/>
+          <TextBox Text="{Binding EditDisplayName, Mode=TwoWay}" Watermark="Иванов И.И."/>
+
+          <TextBlock Text="Роль" FontSize="11" Opacity="0.7" Margin="0,4,0,0"/>
+          <ComboBox ItemsSource="{Binding Roles}"
+                    SelectedItem="{Binding EditRole, Mode=TwoWay}"
+                    HorizontalAlignment="Stretch"/>
+
+          <TextBlock Text="Новый пароль (необязательно)" FontSize="11" Opacity="0.7" Margin="0,4,0,0"/>
+          <TextBox Text="{Binding EditPassword, Mode=TwoWay}"
+                   PasswordChar="●" Watermark="Оставьте пустым чтобы не менять"/>
+
+          <Button Content="Сохранить изменения"
+                  Command="{Binding SaveUserCommand}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <Separator/>
+
+        <Button Content="Удалить пользователя"
+                Command="{Binding DeleteUserCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding SelectedUser,
+                  Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+        <Button Content="Активировать / Заблокировать"
+                Command="{Binding ToggleActiveCommand}"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center"
+                IsEnabled="{Binding SelectedUser,
+                  Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+      </StackPanel>
+    </Border>
+
+  </Grid>
+</UserControl>

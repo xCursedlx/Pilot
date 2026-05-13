@@ -1,0 +1,51 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PilotApp.ViewModels"
+        x:Class="PilotApp.Views.LoginWindow"
+        x:DataType="vm:LoginViewModel"
+        Title="PilotApp — Вход"
+        Width="380" Height="320"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+
+    <Border Padding="36,32">
+        <StackPanel Spacing="16">
+
+            <StackPanel Spacing="4">
+                <Border Background="#4A90D9" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
+                    <TextBlock Text="PMO" Foreground="White" FontWeight="Bold" FontSize="13"/>
+                </Border>
+                <TextBlock Text="PilotApp" FontSize="20" FontWeight="SemiBold"/>
+                <TextBlock Text="Войдите в систему" FontSize="12" Opacity="0.6"/>
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="Логин" FontSize="11" Opacity="0.7"/>
+                <TextBox Text="{Binding Login, Mode=TwoWay}"
+                         Watermark="Введите логин"/>
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="Пароль" FontSize="11" Opacity="0.7"/>
+                <TextBox Text="{Binding Password, Mode=TwoWay}"
+                         PasswordChar="●"
+                         Watermark="Введите пароль"/>
+            </StackPanel>
+
+            <TextBlock Text="{Binding ErrorMessage}"
+                       Foreground="#d32f2f"
+                       FontSize="12"
+                       TextWrapping="Wrap"
+                       IsVisible="{Binding ErrorMessage,
+                   Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+            <Button Content="Войти"
+                    Command="{Binding SignInCommand}"
+                    IsEnabled="{Binding !IsBusy}"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center"/>
+
+        </StackPanel>
+    </Border>
+
+</Window>
