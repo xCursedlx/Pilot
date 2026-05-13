@@ -14,9 +14,26 @@ public partial class TasksViewModel : ObservableObject
 {
     private Action? _markDirty;
     private IDialogService? _dialog;
+    private UserRole _role = UserRole.Admin;
+    private AuditService? _audit;
+    private string _currentLogin = string.Empty;
+
+    public bool CanCreate => PermissionService.CanCreateTask(_role);
+    public bool CanDelete => PermissionService.CanDeleteTask(_role);
+    public bool CanEdit => PermissionService.CanEditTask(_role);
 
     public void SetDirtyCallback(Action markDirty) => _markDirty = markDirty;
     public void SetDialogService(IDialogService dialog) => _dialog = dialog;
+
+    public void SetPermissions(UserRole role, AuditService audit, string login)
+    {
+        _role = role;
+        _audit = audit;
+        _currentLogin = login;
+        OnPropertyChanged(nameof(CanCreate));
+        OnPropertyChanged(nameof(CanDelete));
+        OnPropertyChanged(nameof(CanEdit));
+    }
 
     public ObservableCollection<TaskItem> Tasks { get; } = new();
 
@@ -75,6 +92,7 @@ public partial class TasksViewModel : ObservableObject
         Tasks.Add(t);
         SelectedTask = t;
         _markDirty?.Invoke();
+        _audit?.Log(_currentLogin, AuditEventType.TaskCreated, $"Создана задача: {t.Title}");
         OnFilterChanged();
     }
 
@@ -89,12 +107,12 @@ public partial class TasksViewModel : ObservableObject
                 $"Удалить задачу «{SelectedTask.Title}»?\nЭто действие нельзя отменить.");
             if (!ok) return;
         }
+        var title = SelectedTask.Title;
         var idx = Tasks.IndexOf(SelectedTask);
         Tasks.Remove(SelectedTask);
-        SelectedTask = Tasks.Count == 0
-            ? null
-            : Tasks[Math.Clamp(idx, 0, Tasks.Count - 1)];
+        SelectedTask = Tasks.Count == 0 ? null : Tasks[Math.Clamp(idx, 0, Tasks.Count - 1)];
         _markDirty?.Invoke();
+        _audit?.Log(_currentLogin, AuditEventType.TaskDeleted, $"Удалена задача: {title}");
         OnFilterChanged();
     }
 

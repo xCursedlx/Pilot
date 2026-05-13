@@ -7,8 +7,12 @@
 
   <Grid RowDefinitions="Auto,*" Margin="12">
     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
-      <Button Content="Добавить" Command="{Binding AddDocumentCommand}"/>
-      <Button Content="Удалить" Command="{Binding DeleteDocumentCommand}"/>
+      <Button Content="Добавить"
+              Command="{Binding AddDocumentCommand}"
+              IsVisible="{Binding CanCreate}"/>
+      <Button Content="Удалить"
+              Command="{Binding DeleteDocumentCommand}"
+              IsVisible="{Binding CanDelete}"/>
       <TextBox Watermark="Поиск по названию / версии"
                Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                Width="260"/>
@@ -41,30 +45,31 @@
 
       <ScrollViewer Grid.Column="1">
         <StackPanel Spacing="8"
-                    IsEnabled="{Binding SelectedDocument,
-                      Converter={x:Static ObjectConverters.IsNotNull}}"
+                    IsEnabled="{Binding SelectedDocument, Converter={x:Static ObjectConverters.IsNotNull}}"
                     Margin="4,0,0,0">
 
-          <TextBlock Text="Карточка документа"
-                     FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
+          <TextBlock Text="Карточка документа" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
 
           <StackPanel Spacing="4">
             <TextBlock Text="Название" FontSize="11" Opacity="0.6"/>
             <TextBox Text="{Binding SelectedDocument.Name, Mode=TwoWay}"
-                     Watermark="Название документа"/>
+                     Watermark="Название документа"
+                     IsReadOnly="{Binding !CanEdit}"/>
           </StackPanel>
 
           <StackPanel Spacing="4">
             <TextBlock Text="Описание" FontSize="11" Opacity="0.6"/>
             <TextBox Text="{Binding SelectedDocument.Description, Mode=TwoWay}"
                      AcceptsReturn="True" MinHeight="80"
-                     Watermark="Описание документа"/>
+                     Watermark="Описание документа"
+                     IsReadOnly="{Binding !CanEdit}"/>
           </StackPanel>
 
           <StackPanel Spacing="4">
             <TextBlock Text="Версия" FontSize="11" Opacity="0.6"/>
             <TextBox Text="{Binding SelectedDocument.Version, Mode=TwoWay}"
-                     Watermark="v1, v2, v1.1 ..."/>
+                     Watermark="v1, v2, v1.1 ..."
+                     IsReadOnly="{Binding !CanEdit}"/>
           </StackPanel>
 
           <StackPanel Spacing="4">
@@ -72,6 +77,7 @@
             <ComboBox ItemsSource="{Binding AvailableTasks}"
                       SelectedItem="{Binding SelectedLinkedTask, Mode=TwoWay}"
                       HorizontalAlignment="Stretch"
+                      IsEnabled="{Binding CanEdit}"
                       x:CompileBindings="False">
               <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -88,7 +94,9 @@
                        Text="{Binding SelectedDocument.FilePath, Mode=TwoWay}"
                        IsReadOnly="True" Watermark="Файл не выбран"/>
               <Button Grid.Column="1" Content="Обзор..."
-                      Command="{Binding PickFileCommand}" Margin="6,0,0,0"/>
+                      Command="{Binding PickFileCommand}"
+                      IsVisible="{Binding CanEdit}"
+                      Margin="6,0,0,0"/>
             </Grid>
           </StackPanel>
 

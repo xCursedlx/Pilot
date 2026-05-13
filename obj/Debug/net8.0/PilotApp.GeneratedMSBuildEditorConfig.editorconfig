@@ -26,6 +26,9 @@ build_property.EnableCodeStyleSeverity =
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/AuditLogView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/DashboardView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
@@ -38,6 +41,9 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/KanbanView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/LoginWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
@@ -45,4 +51,7 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/TimeView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[C:/Users/crazy/RiderProjects/PilotApp/PilotApp/Views/UsersView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

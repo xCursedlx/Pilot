@@ -15,10 +15,25 @@ public partial class TimeViewModel : ObservableObject
     private Action? _markDirty;
     private IDialogService? _dialog;
     private TasksViewModel? _tasksVm;
+    private UserRole _role = UserRole.Admin;
+    private AuditService? _audit;
+    private string _currentLogin = string.Empty;
+
+    public bool CanCreate => PermissionService.CanCreateTimeEntry(_role);
+    public bool CanDelete => PermissionService.CanDeleteTimeEntry(_role);
 
     public void SetDirtyCallback(Action markDirty) => _markDirty = markDirty;
     public void SetDialogService(IDialogService dialog) => _dialog = dialog;
     public void SetTasksSource(TasksViewModel tasks) => _tasksVm = tasks;
+
+    public void SetPermissions(UserRole role, AuditService audit, string login)
+    {
+        _role = role;
+        _audit = audit;
+        _currentLogin = login;
+        OnPropertyChanged(nameof(CanCreate));
+        OnPropertyChanged(nameof(CanDelete));
+    }
 
     public ObservableCollection<TimeEntry> Entries { get; } = new();
 
@@ -53,8 +68,7 @@ public partial class TimeViewModel : ObservableObject
     private void AddEntry()
     {
         var matched = _tasksVm?.Tasks
-            .FirstOrDefault(t => t.Title.Equals(NewTaskTitle.Trim(),
-                StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(t => t.Title.Equals(NewTaskTitle.Trim(), StringComparison.OrdinalIgnoreCase));
 
         var entry = new TimeEntry
         {
@@ -67,6 +81,7 @@ public partial class TimeViewModel : ObservableObject
         };
         Entries.Add(entry);
         _markDirty?.Invoke();
+        _audit?.Log(_currentLogin, AuditEventType.TimeEntryCreated, $"Запись времени: {entry.TaskTitle} — {entry.Hours}ч");
         RefreshAll();
         NewTaskTitle = string.Empty;
         NewHours = 0;
@@ -75,27 +90,25 @@ public partial class TimeViewModel : ObservableObject
 
     private bool CanAdd() => !string.IsNullOrWhiteSpace(NewTaskTitle) && NewHours > 0;
 
-    [RelayCommand(CanExecute = nameof(CanDelete))]
+    [RelayCommand(CanExecute = nameof(CanDeleteEntry))]
     private async Task DeleteEntry()
     {
         if (SelectedEntry is null) return;
         if (_dialog is not null)
         {
-            var ok = await _dialog.ConfirmAsync(
-                "Удаление записи",
-                $"Удалить запись «{SelectedEntry.TaskTitle}»?");
+            var ok = await _dialog.ConfirmAsync("Удаление записи", $"Удалить запись «{SelectedEntry.TaskTitle}»?");
             if (!ok) return;
         }
+        var title = SelectedEntry.TaskTitle;
         var idx = Entries.IndexOf(SelectedEntry);
         Entries.Remove(SelectedEntry);
-        SelectedEntry = Entries.Count == 0
-            ? null
-            : Entries[Math.Clamp(idx, 0, Entries.Count - 1)];
+        SelectedEntry = Entries.Count == 0 ? null : Entries[Math.Clamp(idx, 0, Entries.Count - 1)];
         _markDirty?.Invoke();
+        _audit?.Log(_currentLogin, AuditEventType.TimeEntryDeleted, $"Удалена запись: {title}");
         RefreshAll();
     }
 
-    private bool CanDelete() => SelectedEntry is not null;
+    private bool CanDeleteEntry() => SelectedEntry is not null && CanDelete;
 
     partial void OnFilterUserChanged(string value) => RefreshAll();
     partial void OnNewTaskTitleChanged(string value) => AddEntryCommand.NotifyCanExecuteChanged();

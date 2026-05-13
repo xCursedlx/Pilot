@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PilotApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5e5be3ca668cbcc51dbbe78deb0753c2a97ee2a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+04f7ac29f37b59793528937bea966fbae3543610")]
 [assembly: System.Reflection.AssemblyProductAttribute("PilotApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PilotApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -7,8 +7,12 @@
 
   <Grid RowDefinitions="Auto,*" Margin="12">
     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
-      <Button Content="+ Добавить" Command="{Binding AddTaskCommand}"/>
-      <Button Content="Удалить" Command="{Binding DeleteTaskCommand}"/>
+      <Button Content="+ Добавить"
+              Command="{Binding AddTaskCommand}"
+              IsVisible="{Binding CanCreate}"/>
+      <Button Content="Удалить"
+              Command="{Binding DeleteTaskCommand}"
+              IsVisible="{Binding CanDelete}"/>
       <TextBox Watermark="Поиск по названию / исполнителю"
                Text="{Binding FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="240"/>
       <ComboBox ItemsSource="{Binding FilterStatuses}"
@@ -55,7 +59,6 @@
                     </MultiBinding>
                   </TextBlock.Text>
                 </TextBlock>
-                
                 <TextBlock Text="{Binding Priority,
                              Converter={StaticResource TaskPriorityConverter}}"
                            FontSize="10"
@@ -80,30 +83,38 @@
 
       <ScrollViewer Grid.Column="1">
         <StackPanel Spacing="8"
-                    IsEnabled="{Binding SelectedTask,Converter={x:Static ObjectConverters.IsNotNull}}"
+                    IsEnabled="{Binding SelectedTask, Converter={x:Static ObjectConverters.IsNotNull}}"
                     Margin="4,0,0,0">
           <TextBlock Text="Карточка задачи" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,4"/>
 
           <TextBlock Text="Название"/>
-          <TextBox Text="{Binding SelectedTask.Title, Mode=TwoWay}"/>
+          <TextBox Text="{Binding SelectedTask.Title, Mode=TwoWay}"
+                   IsReadOnly="{Binding !CanEdit}"/>
 
           <TextBlock Text="Описание"/>
           <TextBox Text="{Binding SelectedTask.Description, Mode=TwoWay}"
-                   AcceptsReturn="True" MinHeight="60"/>
+                   AcceptsReturn="True" MinHeight="60"
+                   IsReadOnly="{Binding !CanEdit}"/>
 
           <TextBlock Text="Исполнитель"/>
-          <TextBox Text="{Binding SelectedTask.Assignee, Mode=TwoWay}" Watermark="Имя сотрудника"/>
+          <TextBox Text="{Binding SelectedTask.Assignee, Mode=TwoWay}"
+                   Watermark="Имя сотрудника"
+                   IsReadOnly="{Binding !CanEdit}"/>
 
           <TextBlock Text="Проект"/>
-          <TextBox Text="{Binding SelectedTask.Project, Mode=TwoWay}" Watermark="Название проекта"/>
+          <TextBox Text="{Binding SelectedTask.Project, Mode=TwoWay}"
+                   Watermark="Название проекта"
+                   IsReadOnly="{Binding !CanEdit}"/>
 
           <TextBlock Text="Срок выполнения"/>
-          <CalendarDatePicker SelectedDate="{Binding SelectedTask.DueDate, Mode=TwoWay}"/>
+          <CalendarDatePicker SelectedDate="{Binding SelectedTask.DueDate, Mode=TwoWay}"
+                              IsEnabled="{Binding CanEdit}"/>
 
           <TextBlock Text="Статус"/>
           <ComboBox ItemsSource="{Binding Statuses}"
                     SelectedItem="{Binding SelectedTask.Status, Mode=TwoWay}"
-                    HorizontalAlignment="Stretch">
+                    HorizontalAlignment="Stretch"
+                    IsEnabled="{Binding CanEdit}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -120,7 +131,8 @@
           <TextBlock Text="Приоритет"/>
           <ComboBox ItemsSource="{Binding Priorities}"
                     SelectedItem="{Binding SelectedTask.Priority, Mode=TwoWay}"
-                    HorizontalAlignment="Stretch">
+                    HorizontalAlignment="Stretch"
+                    IsEnabled="{Binding CanEdit}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
                 <StackPanel Orientation="Horizontal" Spacing="8">
@@ -137,7 +149,8 @@
 
           <Button Content="Применить изменения"
                   Command="{Binding SaveTaskCommand}"
-                  HorizontalAlignment="Right" Margin="0,8,0,0"/>
+                  HorizontalAlignment="Right" Margin="0,8,0,0"
+                  IsVisible="{Binding CanEdit}"/>
 
           <Separator Margin="0,8,0,4"/>
           <TextBlock Text="Комментарии" FontSize="13" FontWeight="SemiBold"/>
@@ -150,8 +163,7 @@
                         Padding="10,8" Margin="0,0,0,6">
                   <StackPanel Spacing="4">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                      <TextBlock Text="{Binding Author}"
-                                 FontWeight="SemiBold" FontSize="12"/>
+                      <TextBlock Text="{Binding Author}" FontWeight="SemiBold" FontSize="12"/>
                       <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}"
                                  FontSize="11" Opacity="0.6" VerticalAlignment="Center"/>
                     </StackPanel>
@@ -163,8 +175,7 @@
           </ItemsControl>
 
           <TextBlock Text="Автор"/>
-          <TextBox Text="{Binding NewCommentAuthor, Mode=TwoWay}"
-                   Watermark="Имя автора"/>
+          <TextBox Text="{Binding NewCommentAuthor, Mode=TwoWay}" Watermark="Имя автора"/>
           <TextBlock Text="Комментарий"/>
           <TextBox Text="{Binding NewCommentText, Mode=TwoWay}"
                    Watermark="Текст комментария"
