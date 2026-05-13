@@ -14,16 +14,18 @@ public sealed class JsonRepository : IRepository
 
     private readonly string _filePath;
     private readonly string _backupDir;
+    private readonly string? _encryptionKey;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
     private const int MaxBackups = 7;
 
     public string BackupDirectory => _backupDir;
 
-    public JsonRepository(string filePath)
+    public JsonRepository(string filePath, string? encryptionKey = null)
     {
-        _filePath  = filePath;
+        _filePath = filePath;
         _backupDir = Path.Combine(Path.GetDirectoryName(_filePath)!, "backups");
+        _encryptionKey = encryptionKey;
 
         var dir = Path.GetDirectoryName(_filePath);
         if (!string.IsNullOrWhiteSpace(dir))
@@ -58,14 +60,30 @@ public sealed class JsonRepository : IRepository
         }
     }
 
-    private static async Task<AppData?> TryReadAsync(string path, CancellationToken ct)
+    private async Task<AppData?> TryReadAsync(string path, CancellationToken ct)
     {
         try
         {
-            await using var stream = File.OpenRead(path);
-            return await JsonSerializer.DeserializeAsync<AppData>(stream, Options, ct);
+            var content = await File.ReadAllTextAsync(path, ct);
+
+            // Пробуем расшифровать если есть ключ
+            if (_encryptionKey is not null)
+            {
+                try
+                {
+                    var decrypted = EncryptionService.DecryptFromBase64(content, _encryptionKey);
+                    return JsonSerializer.Deserialize<AppData>(decrypted, Options);
+                }
+                catch
+                {
+                    // Файл не зашифрован (legacy) — читаем как обычный JSON
+                }
+            }
+
+            // Обычное чтение
+            return JsonSerializer.Deserialize<AppData>(content, Options);
         }
-        catch (JsonException)
+        catch
         {
             return null;
         }
@@ -77,9 +95,17 @@ public sealed class JsonRepository : IRepository
         try
         {
             var tmp = _filePath + ".tmp";
+            var json = JsonSerializer.Serialize(data, Options);
 
-            await using (var stream = File.Create(tmp))
-                await JsonSerializer.SerializeAsync(stream, data, Options, ct);
+            if (_encryptionKey is not null)
+            {
+                var encrypted = EncryptionService.EncryptToBase64(json, _encryptionKey);
+                await File.WriteAllTextAsync(tmp, encrypted, ct);
+            }
+            else
+            {
+                await File.WriteAllTextAsync(tmp, json, ct);
+            }
 
             if (File.Exists(_filePath))
                 CreateBackup();
@@ -97,7 +123,7 @@ public sealed class JsonRepository : IRepository
 
     private void CreateBackup()
     {
-        var stamp      = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        var stamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
         var backupPath = Path.Combine(_backupDir, $"data_{stamp}.json");
         File.Copy(_filePath, backupPath, overwrite: false);
     }
@@ -114,6 +140,6 @@ public sealed class JsonRepository : IRepository
 
     private string[] GetBackupFiles() =>
         Directory.GetFiles(_backupDir, "data_*.json")
-                 .OrderByDescending(f => f)
-                 .ToArray();
+            .OrderByDescending(f => File.GetLastWriteTime(f))
+            .ToArray();
 }

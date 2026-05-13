@@ -7,6 +7,8 @@
 
   <ScrollViewer>
     <StackPanel Margin="16" Spacing="16">
+
+      <!-- Счётчики -->
       <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="12">
         <Border Grid.Column="0" CornerRadius="8" Padding="16,14" BorderThickness="1"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
@@ -54,7 +56,10 @@
         </Border>
       </Grid>
 
+      <!-- Нижний ряд -->
       <Grid ColumnDefinitions="*,*,2*" ColumnSpacing="12">
+
+        <!-- По статусам -->
         <Border Grid.Column="0" CornerRadius="8" Padding="16" BorderThickness="1"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                 Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
@@ -78,32 +83,46 @@
           </StackPanel>
         </Border>
 
+        <!-- Топ по часам (Admin/Manager) или Мои часы (User) -->
         <Border Grid.Column="1" CornerRadius="8" Padding="16" BorderThickness="1"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                 Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
           <StackPanel Spacing="10">
-            <TextBlock Text="Топ по часам" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,4"/>
-            <ItemsControl ItemsSource="{Binding TopAssignees}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                  <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
-                    <TextBlock Grid.Column="0" Text="{Binding Name}"
-                               VerticalAlignment="Center" FontSize="13"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Border Grid.Column="1" Background="#43A047" CornerRadius="4"
-                            Padding="8,2" Margin="8,0,0,0">
-                      <TextBlock Text="{Binding Hours, StringFormat='{}{0:0.#} ч'}"
-                                 Foreground="White" FontSize="11" FontWeight="SemiBold"/>
-                    </Border>
-                  </Grid>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <TextBlock Text="Нет записей" FontSize="12" Opacity="0.5"
-                       IsVisible="{Binding HasNoAssignees}"/>
+
+            <!-- Admin/Manager: топ исполнителей -->
+            <StackPanel IsVisible="{Binding CanViewTopAssignees}" Spacing="10">
+              <TextBlock Text="Топ по часам" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,4"/>
+              <ItemsControl ItemsSource="{Binding TopAssignees}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                      <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                 VerticalAlignment="Center" FontSize="13"
+                                 TextTrimming="CharacterEllipsis"/>
+                      <Border Grid.Column="1" Background="#43A047" CornerRadius="4"
+                              Padding="8,2" Margin="8,0,0,0">
+                        <TextBlock Text="{Binding Hours, StringFormat='{}{0:0.#} ч'}"
+                                   Foreground="White" FontSize="11" FontWeight="SemiBold"/>
+                      </Border>
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Text="Нет записей" FontSize="12" Opacity="0.5"
+                         IsVisible="{Binding HasNoAssignees}"/>
+            </StackPanel>
+
+            <!-- User: только свои часы -->
+            <StackPanel IsVisible="{Binding !CanViewTopAssignees}" Spacing="10">
+              <TextBlock Text="Мои часы" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,4"/>
+              <TextBlock Text="{Binding MyHours, StringFormat='{}{0:0.#} ч'}"
+                         FontSize="32" FontWeight="Bold" Foreground="#43A047"/>
+            </StackPanel>
+
           </StackPanel>
         </Border>
 
+        <!-- Дедлайны -->
         <Border Grid.Column="2" CornerRadius="8" Padding="16" BorderThickness="1"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                 Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
@@ -139,6 +158,7 @@
                        IsVisible="{Binding HasNoUpcomingDeadlines}"/>
           </StackPanel>
         </Border>
+
       </Grid>
     </StackPanel>
   </ScrollViewer>

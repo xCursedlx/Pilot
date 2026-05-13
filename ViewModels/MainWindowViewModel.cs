@@ -18,6 +18,7 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private readonly IRepository _repo;
     private readonly AuditService _audit;
     private readonly Timer _autoSaveTimer;
+    private readonly BackupService _backup;
     private bool _isDirty;
 
     private UserAccount CurrentUser { get; }
@@ -59,10 +60,11 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     public string UsersHeader => "Пользователи";
     public string CurrentUserInfo => $"{CurrentUser.DisplayName} ({CurrentUser.Role})";
 
-    public MainWindowViewModel(IRepository repo, AuditService audit, UserAccount currentUser, UserRepository userRepo)
+    public MainWindowViewModel(IRepository repo, AuditService audit, UserAccount currentUser, UserRepository userRepo, BackupService backup)
     {
         _repo = repo;
         _audit = audit;
+        _backup = backup;
         CurrentUser = currentUser;
 
         Kanban = new KanbanViewModel(Tasks);
@@ -83,6 +85,9 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         Tasks.SetPermissions(CurrentUser.Role, _audit, CurrentUser.Login);
         Documents.SetPermissions(CurrentUser.Role, _audit, CurrentUser.Login);
         Time.SetPermissions(CurrentUser.Role, _audit, CurrentUser.Login);
+
+        Kanban.SetPermissions(CurrentUser.Role, CurrentUser.DisplayName);
+        Dashboard.SetPermissions(CurrentUser.Role, CurrentUser.DisplayName);
 
         var dialog = new DialogService();
         Tasks.SetDialogService(dialog);
@@ -256,12 +261,34 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
 
         var mainVm = new MainWindowViewModel(
             _repo, _audit, loginWindow.LoggedInUser,
-            ((App)Application.Current!).UserRepo);
+            ((App)Application.Current!).UserRepo,
+            ((App)Application.Current!).Backup);
 
         var mainWindow = new PilotApp.Views.MainWindow { DataContext = mainVm };
         lifetime.MainWindow = mainWindow;
         mainWindow.Show();
         _ = mainVm.LoadDataCommand.ExecuteAsync(null);
+    }
+    [RelayCommand]
+    private async Task CreateBackup()
+    {
+        IsBusy = true;
+        StatusMessage = "Создание резервной копии...";
+        try
+        {
+            await SaveData();
+            await _backup.CreateAllBackupsAsync();
+            StatusMessage = $"Резервная копия создана в {DateTime.Now:HH:mm:ss}";
+            _audit.Log(CurrentUser.Login, AuditEventType.LoginSuccess, "Создана резервная копия данных");
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Ошибка резервного копирования: {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     public void Dispose() => _autoSaveTimer.Dispose();

@@ -6,12 +6,15 @@ using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PilotApp.Models;
+using PilotApp.Services;
 
 namespace PilotApp.ViewModels;
 
 public partial class KanbanViewModel : ObservableObject
 {
     private readonly TasksViewModel _tasksVm;
+    private UserRole _role = UserRole.Admin;
+    private string _currentLogin = string.Empty;
 
     public KanbanColumn New { get; } = new(AppTaskStatus.New, "Новые");
     public KanbanColumn InProgress { get; } = new(AppTaskStatus.InProgress, "В работе");
@@ -22,16 +25,26 @@ public partial class KanbanViewModel : ObservableObject
 
     [ObservableProperty] private TaskItem? selectedTask;
 
+    public bool CanMove => PermissionService.CanEditTask(_role);
+
     public KanbanViewModel(TasksViewModel tasksVm)
     {
         _tasksVm = tasksVm;
-        Columns = new[] { New, InProgress, OnReview, Done };
+        Columns = [New, InProgress, OnReview, Done];
 
         _tasksVm.Tasks.CollectionChanged += OnTasksCollectionChanged;
 
         foreach (var task in _tasksVm.Tasks)
             task.PropertyChanged += OnTaskPropertyChanged;
 
+        Reload();
+    }
+
+    public void SetPermissions(UserRole role, string login)
+    {
+        _role = role;
+        _currentLogin = login;
+        OnPropertyChanged(nameof(CanMove));
         Reload();
     }
 
@@ -59,7 +72,22 @@ public partial class KanbanViewModel : ObservableObject
         foreach (var col in Columns)
             col.Items.Clear();
 
-        foreach (var task in _tasksVm.Tasks)
+        var tasks = _role == UserRole.User
+            ? _tasksVm.Tasks.Where(t =>
+                (t.Assignee ?? "").Equals(_currentLogin, System.StringComparison.OrdinalIgnoreCase) ||
+                (t.Assignee ?? "").Equals(
+                    _tasksVm.Tasks.FirstOrDefault()?.Assignee ?? _currentLogin,
+                    System.StringComparison.OrdinalIgnoreCase))
+            : _tasksVm.Tasks;
+
+        // Для User фильтруем только свои задачи по отображаемому имени
+        var visibleTasks = _role == UserRole.User
+            ? _tasksVm.Tasks.Where(t =>
+                string.IsNullOrWhiteSpace(t.Assignee) ||
+                t.Assignee.Equals(_currentLogin, System.StringComparison.OrdinalIgnoreCase))
+            : _tasksVm.Tasks;
+
+        foreach (var task in visibleTasks)
             GetColumn(task.Status)?.Items.Add(task);
 
         foreach (var col in Columns)
@@ -69,7 +97,7 @@ public partial class KanbanViewModel : ObservableObject
     private KanbanColumn? GetColumn(AppTaskStatus status) =>
         Columns.FirstOrDefault(c => c.Status == status);
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanMove))]
     private void MoveTask((TaskItem task, AppTaskStatus target) args)
     {
         var (task, target) = args;

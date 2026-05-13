@@ -65,6 +65,12 @@
                   Background="#444444" Foreground="White"
                   BorderBrush="#666666" BorderThickness="1"
                   Padding="12,6" Content="⬇  Загрузить"/>
+          
+          <Button Command="{Binding CreateBackupCommand}"
+                  IsEnabled="{Binding !IsBusy}"
+                  Background="#444444" Foreground="White"
+                  BorderBrush="#666666" BorderThickness="1"
+                  Padding="12,6" Content="💾 Бэкап"/>
 
           <Button Command="{Binding SaveDataCommand}" IsEnabled="{Binding !IsBusy}"
                   Background="#444444" Foreground="White"
